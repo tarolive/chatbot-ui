@@ -20,12 +20,18 @@ REACT_APP_LLM_URL='http://localhost:8080/admin/assistant/llm'
 ```
 
 ```bash
-npm install && npm run start:dev
+npm install
+npm run openapi
+npm run start:dev
 ```
 
 ## Development scripts
 
 ```sh
+
+# Generate From Source
+npm run openapi
+
 # Install development/build dependencies
 npm install
 

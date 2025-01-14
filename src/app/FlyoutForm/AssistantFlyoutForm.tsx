@@ -36,7 +36,7 @@ interface LLMAPIResponse {
   description: string;
   name: string;
 }
-interface FlyoutFormProps {
+interface AssistantFlyoutFormProps {
   header: string;
   hideFlyout: () => void;
 }
@@ -44,7 +44,7 @@ interface FlyoutFormProps {
 type validate = 'success' | 'error' | 'default';
 type questionsValidate = 'error' | 'default';
 
-export const FlyoutForm: React.FunctionComponent<FlyoutFormProps> = ({ header, hideFlyout }: FlyoutFormProps) => {
+export const AssistantFlyoutForm: React.FunctionComponent<AssistantFlyoutFormProps> = ({ header, hideFlyout }: AssistantFlyoutFormProps) => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [loadedFormFields, setLoadedFormFields] = React.useState(false);
   const [title, setTitle] = React.useState('');

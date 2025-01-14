@@ -7,7 +7,11 @@ import { NavLink } from 'react-router-dom';
 import { FlyoutWizardProvider } from '@app/FlyoutWizard/FlyoutWizardContext';
 import { FlyoutList } from '@app/FlyoutList/FlyoutList';
 import { FlyoutWizard } from '@app/FlyoutWizard/FlyoutWizard';
-import { FlyoutForm } from '@app/FlyoutForm/FlyoutForm';
+import { AssistantFlyoutForm } from '@app/FlyoutForm/AssistantFlyoutForm';
+import { ComponentType } from '@app/types/enum/ComponentType';
+import { KnowledgeSourceFlyoutForm } from '@app/FlyoutForm/KnowledgeSourceFlyoutForm';
+import { LLMConnectionFlyoutForm } from '@app/FlyoutForm/LLMConnectionFlyoutForm';
+import { FlyoutError } from '@app/FlyoutError/FlyoutError';
 
 export const SidebarWithFlyout: React.FunctionComponent = () => {
   const [sidebarHeight, setSidebarHeight] = useState(0);
@@ -63,28 +67,59 @@ export const SidebarWithFlyout: React.FunctionComponent = () => {
         <FlyoutWizardProvider>
           <FlyoutWizard
             steps={[
-              /*<FlyoutStartScreen
-                key="assistant-start"
-                title={FLYOUT_CONTENT[visibleFlyout].title}
-                subtitle={FLYOUT_CONTENT[visibleFlyout].subtitle}
-                primaryButtonText={FLYOUT_CONTENT[visibleFlyout].primaryButtonText}
-                header="Assistants"
-                hideFlyout={() => setVisibleFlyout(null)}
-              />,*/
               <FlyoutList
                 key="assistant-list"
                 hideFlyout={() => setVisibleFlyout(null)}
-                buttonText="New assistant"
+                buttonText="New Assistant"
+                componentType={ComponentType.ASSISTANT}
                 typeWordPlural="assistants"
                 title={visibleFlyout}
               />,
-              <FlyoutForm key="assistant-form" header="New assistant" hideFlyout={() => setVisibleFlyout(null)} />,
+              <AssistantFlyoutForm key="assistant-form" header="New assistant" hideFlyout={() => setVisibleFlyout(null)} />,
             ]}
           />
         </FlyoutWizardProvider>
       );
     }
-    return;
+    if (visibleFlyout === 'Knowledge Sources') {
+      return (
+        <FlyoutWizardProvider>
+          <FlyoutWizard
+            steps={[
+              <FlyoutList
+                key="knowledge-source-list"
+                hideFlyout={() => setVisibleFlyout(null)}
+                buttonText="New Knowledge Source"
+                componentType={ComponentType.KNOWLEDGE_SOURCE}
+                typeWordPlural="knowledge sources"
+                title={visibleFlyout}
+              />,
+              <KnowledgeSourceFlyoutForm key="knowledge-source-form" header="New Knowledge Source" hideFlyout={() => setVisibleFlyout(null)} />,
+            ]}
+          />
+        </FlyoutWizardProvider>
+      );
+    }
+    if (visibleFlyout === 'LLM Connections') {
+      return (
+        <FlyoutWizardProvider>
+          <FlyoutWizard
+            steps={[
+              <FlyoutList
+                key="llm-connection-list"
+                hideFlyout={() => setVisibleFlyout(null)}
+                buttonText="New LLM Connection"
+                componentType={ComponentType.LLM_CONNECTION}
+                typeWordPlural="llm connections"
+                title={visibleFlyout}
+              />,
+              <LLMConnectionFlyoutForm key="llm-connection-form" header="New LLM Connection" hideFlyout={() => setVisibleFlyout(null)} />,
+            ]}
+          />
+        </FlyoutWizardProvider>
+      );
+    }
+    return <FlyoutError title={'Exception'} />;
   };
 
   return (
@@ -111,6 +146,22 @@ export const SidebarWithFlyout: React.FunctionComponent = () => {
               aria-expanded={visibleFlyout === 'Assistants'}
             >
               Assistants
+            </NavItem>
+            <NavItem
+              component="button"
+              onClick={toggleFlyout}
+              aria-haspopup="dialog"
+              aria-expanded={visibleFlyout === 'Knowledge Sources'}
+            >
+              Knowledge Sources
+            </NavItem>
+            <NavItem
+              component="button"
+              onClick={toggleFlyout}
+              aria-haspopup="dialog"
+              aria-expanded={visibleFlyout === 'LLM Connections'}
+            >
+              LLM Connections
             </NavItem>
           </NavList>
         </Nav>
