@@ -4,13 +4,12 @@ import { FlyoutFooter } from '@app/FlyoutFooter/FlyoutFooter';
 import { FlyoutHeader } from '@app/FlyoutHeader/FlyoutHeader';
 import { FlyoutLoading } from '@app/FlyoutLoading/FlyoutLoading';
 import { useFlyoutWizard } from '@app/FlyoutWizard/FlyoutWizardContext';
-import { assistantAdminAPI, chatbotAPI, knowledgeSourceAPI, llmConnectionAPI } from '@app/adapters/APIExporter';
+import { assistantAdminAPI, knowledgeSourceAPI, llmConnectionAPI } from '@app/adapters/APIExporter';
 import { CannedChatbot } from '@app/types/CannedChatbot';
 import { ErrorObject } from '@app/types/ErrorObject';
 import { ComponentType } from '@app/types/enum/ComponentType';
 import { ERROR_TITLE } from '@app/utils/utils';
 import { Label, Menu, MenuContent, MenuItem, MenuList, SearchInput } from '@patternfly/react-core';
-import { BaseAPI } from '@sdk/base';
 import * as React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -38,11 +37,9 @@ export const FlyoutList: React.FunctionComponent<FlyoutListProps> = ({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [selectedItem, setSelectedItem] = React.useState<Object>([]);
+  const [selectedItem, setSelectedItem] = React.useState<unknown>([]);
 
-  const { flyoutMenuSelectedChatbot, updateFlyoutMenuSelectedChatbot, chatbots, setChatbots } = useAppData();
-
-  var listFunction;
+  const { updateFlyoutMenuSelectedChatbot, setChatbots } = useAppData();
 
   const header = (
     <div className="title-with-label">
@@ -74,9 +71,8 @@ export const FlyoutList: React.FunctionComponent<FlyoutListProps> = ({
   };
 
   const getItems = async () => {
-    const url = process.env.REACT_APP_INFO_URL ?? '';
     try {
-      var data;
+      let data;
       if(componentType == ComponentType.ASSISTANT) {
         await assistantAdminAPI.listAssistants().then((response) => data = response.data);
       } else if(componentType == ComponentType.KNOWLEDGE_SOURCE) {
@@ -140,7 +136,7 @@ export const FlyoutList: React.FunctionComponent<FlyoutListProps> = ({
             className="pf-chatbot__menu-item"
             itemId={item.id}
             key={item.name}
-            isSelected={item.id === selectedItem['id']}
+            isSelected={item.id === (selectedItem as { id: string })?.id}
             description={item.description}
           >
             {item.displayName ?? item.name}

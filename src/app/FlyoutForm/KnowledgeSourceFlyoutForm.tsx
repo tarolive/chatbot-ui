@@ -1,12 +1,10 @@
-import { AxiosError } from 'axios';
-import { useAppData } from '@app/AppData/AppDataContext';
 import { FlyoutError } from '@app/FlyoutError/FlyoutError';
 import { FlyoutFooter } from '@app/FlyoutFooter/FlyoutFooter';
 import { FlyoutHeader } from '@app/FlyoutHeader/FlyoutHeader';
 import { FlyoutLoading } from '@app/FlyoutLoading/FlyoutLoading';
 import { useFlyoutWizard } from '@app/FlyoutWizard/FlyoutWizardContext';
+import { knowledgeSourceAPI } from '@app/adapters/APIExporter';
 import { ErrorObject, Violation } from '@app/types/ErrorObject';
-import { ERROR_TITLE } from '@app/utils/utils';
 import {
   Dropdown,
   DropdownItem,
@@ -18,14 +16,11 @@ import {
   HelperTextItem,
   MenuToggle,
   MenuToggleElement,
-  TextArea,
-  TextInput,
+  TextInput
 } from '@patternfly/react-core';
-import { ExclamationCircleIcon } from '@patternfly/react-icons';
-import * as React from 'react';
-import { ExpandingTextInputs } from './ExpandingTextInputs';
 import { CreateRetrieverConnectionRequest, ElasticsearchConnection } from '@sdk/model';
-import { knowledgeSourceAPI } from '@app/adapters/APIExporter';
+import { AxiosError } from 'axios';
+import * as React from 'react';
 
 interface KnowledgeSourceFlyoutFormProps {
   header: string;
@@ -36,11 +31,10 @@ type validate = 'success' | 'error' | 'default';
 
 export const KnowledgeSourceFlyoutForm: React.FunctionComponent<KnowledgeSourceFlyoutFormProps> = ({ header, hideFlyout }: KnowledgeSourceFlyoutFormProps) => {
   const [isLoading, setIsLoading] = React.useState(true);
-  const [loadedFormFields, setLoadedFormFields] = React.useState(false);
-  
+
   const [validated, setValidated] = React.useState<validate>('default');
   const [error, setError] = React.useState<ErrorObject>();
-  const { nextStep, prevStep, setReloadList } = useFlyoutWizard();
+  const { nextStep, prevStep } = useFlyoutWizard();
 
   // UI State
   const [isKnowledgeSourceOpen, setIsKnowledgeSourceOpen] = React.useState(false);
@@ -48,7 +42,7 @@ export const KnowledgeSourceFlyoutForm: React.FunctionComponent<KnowledgeSourceF
   // Form Fields
   const [name, setName] = React.useState('');
   const [description, setDescription] = React.useState('');
-  const [embeddingType, setEmbeddingType] = React.useState('');
+  const [embeddingType, setEmbeddingType] = React.useState('nomic');
 
   // Elasticsearch Specific
   const [textKey, setTextKey] = React.useState('');
@@ -58,12 +52,6 @@ export const KnowledgeSourceFlyoutForm: React.FunctionComponent<KnowledgeSourceF
   const [apiKey, setApiKey] = React.useState('');
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
-
-  const ERROR_BODY = {
-    'Error: 404': `Service is currently unavailable. Click retry or try again later.`,
-    'Error: 500': `Service has encountered an error. Click retry or try again later.`,
-    'Error: Other': `Service has encountered an error. Click retry or try again later.`,
-  };
 
   React.useEffect(() => {
     validateForm();
@@ -95,6 +83,10 @@ export const KnowledgeSourceFlyoutForm: React.FunctionComponent<KnowledgeSourceF
   const handleDescriptionChange = (_event, description: string) => {
     setDescription(description);
 
+  };
+
+  const handleEmbeddingTypeChange = (_event, embeddingType: string) => {
+    setEmbeddingType(embeddingType);
   };
 
   const handleTextKeyChange = (_event, textKey: string) => {
@@ -143,7 +135,7 @@ export const KnowledgeSourceFlyoutForm: React.FunctionComponent<KnowledgeSourceF
       name: name.trim() === '' ? undefined : name,
       description: description.trim() === '' ? undefined : description,
       baseRetrieverRequest: elasticsearchConnection,
-      embeddingType: 'nomic'
+      embeddingType: embeddingType.trim() === '' ? undefined : embeddingType
     }
 
     try {
@@ -154,9 +146,9 @@ export const KnowledgeSourceFlyoutForm: React.FunctionComponent<KnowledgeSourceF
       const response = axiosError.response;
 
       if(response?.status === 400) {
-        const data : any = response?.data;
+        const data: ErrorObject = response?.data as ErrorObject;
         if ('violations' in data) {
-          const violations: Violation[] = data['violations'] as Violation[];
+          const violations: Violation[] = data?.violations ?? [];
           setError({ title: 'Error creating retriever', violations: violations});
         } else {
           setError({ title: 'Error creating retriever', body: axiosError?.message });
@@ -260,6 +252,23 @@ export const KnowledgeSourceFlyoutForm: React.FunctionComponent<KnowledgeSourceF
                 </HelperText>
               </FormHelperText>
             </FormGroup>
+
+            <FormGroup label="Embedding Type" fieldId="flyout-form-embedding-type">
+              <TextInput
+                type="text"
+                id="flyout-form-embedding-type"
+                name="flyout-form-embedding-type"
+                value={embeddingType}
+                onChange={handleEmbeddingTypeChange}
+              />
+              <FormHelperText>
+                <HelperText>
+                  <HelperTextItem>Embedding Type of the Knowledge Source</HelperTextItem>
+                </HelperText>
+              </FormHelperText>
+            </FormGroup>
+
+            
 
             
             <FormGroup label="Text Key" fieldId="flyout-form-text-key">

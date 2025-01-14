@@ -182,7 +182,7 @@ paths:
                   type: string
                 modelType:
                   type: string
-                servingRuntime:
+                servingRuntimeType:
                   type: string
                 url:
                   type: string

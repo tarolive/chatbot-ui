@@ -1,12 +1,10 @@
-import { AxiosError } from 'axios';
-import { useAppData } from '@app/AppData/AppDataContext';
 import { FlyoutError } from '@app/FlyoutError/FlyoutError';
 import { FlyoutFooter } from '@app/FlyoutFooter/FlyoutFooter';
 import { FlyoutHeader } from '@app/FlyoutHeader/FlyoutHeader';
 import { FlyoutLoading } from '@app/FlyoutLoading/FlyoutLoading';
 import { useFlyoutWizard } from '@app/FlyoutWizard/FlyoutWizardContext';
+import { llmConnectionAPI } from '@app/adapters/APIExporter';
 import { ErrorObject, Violation } from '@app/types/ErrorObject';
-import { ERROR_TITLE } from '@app/utils/utils';
 import {
   Dropdown,
   DropdownItem,
@@ -18,14 +16,11 @@ import {
   HelperTextItem,
   MenuToggle,
   MenuToggleElement,
-  TextArea,
-  TextInput,
+  TextInput
 } from '@patternfly/react-core';
-import { ExclamationCircleIcon } from '@patternfly/react-icons';
+import { LLMConnection } from '@sdk/model';
+import { AxiosError } from 'axios';
 import * as React from 'react';
-import { ExpandingTextInputs } from './ExpandingTextInputs';
-import { CreateRetrieverConnectionRequest, ElasticsearchConnection, LLMConnection } from '@sdk/model';
-import { knowledgeSourceAPI, llmConnectionAPI } from '@app/adapters/APIExporter';
 
 interface LLMConnectionFlyoutFormProps {
   header: string;
@@ -41,11 +36,10 @@ const SERVING_RUNTIME_TYPE = ['openai'];
 
 export const LLMConnectionFlyoutForm: React.FunctionComponent<LLMConnectionFlyoutFormProps> = ({ header, hideFlyout }: LLMConnectionFlyoutFormProps) => {
   const [isLoading, setIsLoading] = React.useState(true);
-  const [loadedFormFields, setLoadedFormFields] = React.useState(false);
   
   const [validated, setValidated] = React.useState<validate>('default');
   const [error, setError] = React.useState<ErrorObject>();
-  const { nextStep, prevStep, setReloadList } = useFlyoutWizard();
+  const { nextStep, prevStep } = useFlyoutWizard();
 
   // UI State
   const [isModelTypeOpen, setIsModelTypeOpen] = React.useState(false);
@@ -61,14 +55,6 @@ export const LLMConnectionFlyoutForm: React.FunctionComponent<LLMConnectionFlyou
   const [apiKey, setApiKey] = React.useState('');
   const [temperature, setTemperature] = React.useState(0.5);
   const [maxTokens, setMaxTokens] = React.useState(500);
-
-  
-
-  const ERROR_BODY = {
-    'Error: 404': `Service is currently unavailable. Click retry or try again later.`,
-    'Error: 500': `Service has encountered an error. Click retry or try again later.`,
-    'Error: Other': `Service has encountered an error. Click retry or try again later.`,
-  };
 
   React.useEffect(() => {
     validateForm();
@@ -97,37 +83,22 @@ export const LLMConnectionFlyoutForm: React.FunctionComponent<LLMConnectionFlyou
   
   const handleNameChange = (_event, name: string) => {
     setName(name);
-    validateForm();
   };
 
   const handleDescriptionChange = (_event, description: string) => {
     setDescription(description);
-    validateForm();
-  };
-
-  const handleModelTypeChange = (_event, modelType: string) => {
-    setModelType(modelType);
-    validateForm();
-  };
-
-  const handleServingRuntimeTypeChange = (_event, servingRuntimeType: string) => {
-    setServingRuntimeType(servingRuntimeType);
-    validateForm();
   };
 
   const handleModelNameChange = (_event, modelName: string) => {
     setModelName(modelName);
-    validateForm();
   };
 
   const handleUrlChange = (_event, url: string) => {
     setUrl(url);
-    validateForm();
   };
 
   const handleApiKeyChange = (_event, apiKey: string) => {
     setApiKey(apiKey);
-    validateForm();
   };
 
   const handleTemperatureChange = (_event, temperature: string) => {
@@ -171,9 +142,9 @@ export const LLMConnectionFlyoutForm: React.FunctionComponent<LLMConnectionFlyou
       const response = axiosError.response;
 
       if(response?.status === 400) {
-        const data: any = response?.data;
+        const data: ErrorObject = response?.data as ErrorObject;
         if ('violations' in data) {
-          const violations: Violation[] = data['violations'] as Violation[];
+          const violations: Violation[] = data?.violations ?? [];
           setError({ title: 'Error creating retriever', violations: violations});
         } else {
           setError({ title: 'Error creating retriever', body: axiosError?.message });
@@ -387,7 +358,7 @@ export const LLMConnectionFlyoutForm: React.FunctionComponent<LLMConnectionFlyou
               />
               <FormHelperText>
                 <HelperText>
-                  <HelperTextItem>Max Tokens for the LLM's Response (Keep in mind this counts toward the max tokens both input and output allowed by the LLM)</HelperTextItem>
+                  <HelperTextItem>Max Tokens for the LLM&apos;s Response (Keep in mind this counts toward the max tokens both input and output allowed by the LLM)</HelperTextItem>
                 </HelperText>
               </FormHelperText>
             </FormGroup>
