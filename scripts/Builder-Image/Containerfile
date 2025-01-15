@@ -1,0 +1,8 @@
+FROM registry.access.redhat.com/ubi9/nodejs-20-minimal AS production
+
+USER root
+
+# Install Java
+RUN microdnf install java-21-openjdk-devel -y && microdnf clean all
+
+USER 1001
