@@ -14,8 +14,8 @@ tags:
     description: APIs to manage Content Retriever connections
   - name: LLM Connection Admin
     description: APIs to manage LLM connections
-security:
-  - OIDC: [ ]
+# security:
+  # - OIDC: [ ]
 paths:
   /admin/assistant:
     get:
@@ -528,23 +528,17 @@ components:
     ElasticsearchConnection:
       type: object
       required:
-        - textKey
         - index
-        - scheme
         - host
       x-discriminator-value: elasticsearch
       allOf:
         - $ref: '#/components/schemas/BaseRetrieverConnection'
         - properties:
-            textKey:
-              type: string
             metadataFields:
               type: array
               items:
                 type: string
             index:
-              type: string
-            scheme:
               type: string
             host:
               type: string

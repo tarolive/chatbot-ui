@@ -45,17 +45,14 @@ export const KnowledgeSourceFlyoutForm: React.FunctionComponent<KnowledgeSourceF
   const [embeddingType, setEmbeddingType] = React.useState('nomic');
 
   // Elasticsearch Specific
-  const [textKey, setTextKey] = React.useState('');
   const [index, setIndex] = React.useState('');
-  const [scheme, setScheme] = React.useState('');
   const [host, setHost] = React.useState('');
-  const [apiKey, setApiKey] = React.useState('');
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
 
   React.useEffect(() => {
     validateForm();
-  }, [name, description, index, scheme, host, textKey]);
+  }, [name, description, index, host]);
 
   const validateForm = () => {
 
@@ -65,11 +62,7 @@ export const KnowledgeSourceFlyoutForm: React.FunctionComponent<KnowledgeSourceF
       setValidated('default');
     } else if (index.trim() === '') {
       setValidated('default');
-    } else if (scheme.trim() === '') {
-      setValidated('default');
     } else if (host.trim() === '') {
-      setValidated('default');
-    } else if (textKey.trim() === '') {
       setValidated('default');
     } else {
       setValidated('success');
@@ -89,24 +82,12 @@ export const KnowledgeSourceFlyoutForm: React.FunctionComponent<KnowledgeSourceF
     setEmbeddingType(embeddingType);
   };
 
-  const handleTextKeyChange = (_event, textKey: string) => {
-    setTextKey(textKey);
-  };
-
   const handleIndexChange = (_event, index: string) => {
     setIndex(index);
   };
 
-  const handleSchemeChange = (_event, scheme: string) => {
-    setScheme(scheme);
-  };
-
   const handleHostChange = (_event, host: string) => {
     setHost(host);
-  };
-
-  const handleApiKeyChange = (_event, apiKey: string) => {
-    setApiKey(apiKey);
   };
 
   const handleUsernameChange = (_event, username: string) => {
@@ -122,11 +103,8 @@ export const KnowledgeSourceFlyoutForm: React.FunctionComponent<KnowledgeSourceF
     const elasticsearchConnection : ElasticsearchConnection = {
       host: host.trim() === '' ? null : host,
       index: index.trim() === '' ? null : index,
-      apiKey: apiKey.trim() === '' ? null : apiKey,
       username: username.trim() === '' ? null : username,
       password: password.trim() === '' ? null : password,
-      scheme: scheme.trim() === '' ? null : scheme,
-      textKey: textKey.trim() === '' ? null : textKey,
       contentRetrieverType: "elasticsearch"
     }
 
@@ -268,24 +246,6 @@ export const KnowledgeSourceFlyoutForm: React.FunctionComponent<KnowledgeSourceF
               </FormHelperText>
             </FormGroup>
 
-            
-
-            
-            <FormGroup label="Text Key" fieldId="flyout-form-text-key">
-              <TextInput
-                type="text"
-                id="flyout-form-text-key"
-                name="flyout-form-text-key"
-                value={textKey}
-                onChange={handleTextKeyChange}
-              />
-              <FormHelperText>
-                <HelperText>
-                  <HelperTextItem>Key containing the text information of your document</HelperTextItem>
-                </HelperText>
-              </FormHelperText>
-            </FormGroup>
-
             <FormGroup label="Index" fieldId="flyout-form-index">
               <TextInput
                 type="text"
@@ -301,21 +261,6 @@ export const KnowledgeSourceFlyoutForm: React.FunctionComponent<KnowledgeSourceF
               </FormHelperText>
             </FormGroup>
 
-            <FormGroup label="Scheme" fieldId="flyout-form-scheme">
-              <TextInput
-                type="text"
-                id="flyout-form-scheme"
-                name="flyout-form-scheme"
-                value={scheme}
-                onChange={handleSchemeChange}
-              />
-              <FormHelperText>
-                <HelperText>
-                  <HelperTextItem>http or https</HelperTextItem>
-                </HelperText>
-              </FormHelperText>
-            </FormGroup>
-
             <FormGroup label="Host" fieldId="flyout-form-host">
               <TextInput
                 type="text"
@@ -327,21 +272,6 @@ export const KnowledgeSourceFlyoutForm: React.FunctionComponent<KnowledgeSourceF
               <FormHelperText>
                 <HelperText>
                   <HelperTextItem>Host of the ElasticSearch Cluster</HelperTextItem>
-                </HelperText>
-              </FormHelperText>
-            </FormGroup>
-
-            <FormGroup label="API Key" fieldId="flyout-form-api-key">
-              <TextInput
-                type="text"
-                id="flyout-form-api-key"
-                name="flyout-form-api-key"
-                value={apiKey}
-                onChange={handleApiKeyChange}
-              />
-              <FormHelperText>
-                <HelperText>
-                  <HelperTextItem>API Key for the ElasticSearch Cluster (Currently Ignored Use Username/Password)</HelperTextItem>
                 </HelperText>
               </FormHelperText>
             </FormGroup>

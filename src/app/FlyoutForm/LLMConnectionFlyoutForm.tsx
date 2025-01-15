@@ -103,8 +103,11 @@ export const LLMConnectionFlyoutForm: React.FunctionComponent<LLMConnectionFlyou
 
   const handleTemperatureChange = (_event, temperature: string) => {
     const parsedTemperature = parseFloat(temperature);
-    if (!isNaN(parsedTemperature) && parsedTemperature >= 0 && parsedTemperature <= 1) {
+    if (!isNaN(parsedTemperature)) {
       setTemperature(parsedTemperature);
+      if (parsedTemperature < 0 || parsedTemperature > 1) {
+        setValidated('error');
+      }
     } else {
       setValidated('error');
     }
