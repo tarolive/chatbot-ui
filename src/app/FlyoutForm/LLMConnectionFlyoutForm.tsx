@@ -21,6 +21,7 @@ import {
 import { LLMConnection } from '@sdk/model';
 import { AxiosError } from 'axios';
 import * as React from 'react';
+import { validate } from 'webpack';
 
 interface LLMConnectionFlyoutFormProps {
   header: string;
@@ -53,6 +54,7 @@ export const LLMConnectionFlyoutForm: React.FunctionComponent<LLMConnectionFlyou
   const [modelName, setModelName] = React.useState('');
   const [url, setUrl] = React.useState('');
   const [apiKey, setApiKey] = React.useState('');
+  const [temperatureString, setTemperatureString] = React.useState('0.5');
   const [temperature, setTemperature] = React.useState(0.5);
   const [maxTokens, setMaxTokens] = React.useState(500);
 
@@ -73,8 +75,6 @@ export const LLMConnectionFlyoutForm: React.FunctionComponent<LLMConnectionFlyou
     } else if (modelName.trim() === '') {
       setValidated('default');
     } else if (url.trim() === '') {
-      setValidated('default');
-    } else if (apiKey.trim() === '') {
       setValidated('default');
     } else {
       setValidated('success');
@@ -102,12 +102,11 @@ export const LLMConnectionFlyoutForm: React.FunctionComponent<LLMConnectionFlyou
   };
 
   const handleTemperatureChange = (_event, temperature: string) => {
+    setTemperatureString(temperature);
     const parsedTemperature = parseFloat(temperature);
-    if (!isNaN(parsedTemperature)) {
+    if (!isNaN(parsedTemperature) && parsedTemperature >= 0 && parsedTemperature <= 1) {
       setTemperature(parsedTemperature);
-      if (parsedTemperature < 0 || parsedTemperature > 1) {
-        setValidated('error');
-      }
+      validateForm();
     } else {
       setValidated('error');
     }
@@ -117,6 +116,7 @@ export const LLMConnectionFlyoutForm: React.FunctionComponent<LLMConnectionFlyou
     const parsedMaxTokens = parseFloat(maxTokens);
     if (!isNaN(parsedMaxTokens)) {
       setMaxTokens(parsedMaxTokens);
+      validateForm();
     } else {
       setValidated('error');
     }
@@ -339,13 +339,13 @@ export const LLMConnectionFlyoutForm: React.FunctionComponent<LLMConnectionFlyou
                 type="text"
                 id="flyout-form-temperature"
                 name="flyout-form-temperature"
-                value={temperature}
+                value={temperatureString}
                 onChange={handleTemperatureChange}
               />
               <FormHelperText>
                 <HelperText>
                   <HelperTextItem>
-                    Temperature for the LLM (must be between 0 and 1). 
+                    Temperature for the LLM (must be between 0 and 1). <br/>
                     <a href="https://www.promptingguide.ai/introduction/settings" target="_blank" rel="noopener noreferrer">Learn more</a></HelperTextItem>
                 </HelperText>
               </FormHelperText>
