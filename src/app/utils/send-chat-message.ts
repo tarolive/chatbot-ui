@@ -1,7 +1,5 @@
+import { Properties } from '@app/Properties';
 import { UserFacingFile } from '@app/types/UserFacingFile';
-
-const url = process.env.REACT_APP_ROUTER_URL ?? '';
-const urlMultipart = process.env.REACT_APP_ROUTER_MULTIPART_URL ?? '';
 
 // TODO: When backend supports persistent files (ie, with a separate file-upload endpoint),
 //  this message interface can be changed to use file references in the message. Alternatively,
@@ -24,24 +22,23 @@ function buildMultipartRequestInit(chatJson: string, files: UserFacingFile[]): R
   const formData = new FormData();
 
   // Include JSON chat request as first multipart part, named "jsonRequest" and of type "application/json"
-  formData.append('jsonRequest', new Blob(
-    [
-      chatJson
-    ], {
+  formData.append(
+    'jsonRequest',
+    new Blob([chatJson], {
       type: 'application/json',
-    }
-  ));
+    }),
+  );
 
   // Include each attached file as subsequent multipart parts, all having part name "document".
   // Mimetype will be set automatically from the Blob (which is likely all File types, a subclass of Blob)
-  files.forEach((file: UserFacingFile) => formData.append('document', file.blob))
+  files.forEach((file: UserFacingFile) => formData.append('document', file.blob));
 
   return {
     method: 'POST',
     headers: {
       // Do not include Content-Type; fetch will handle multipart content-type automatically
     },
-    body: formData
+    body: formData,
   };
 }
 
@@ -57,19 +54,19 @@ function buildStandardRequestInit(chatJson: string): RequestInit {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: chatJson
+    body: chatJson,
   };
 }
 
 export async function sendChatMessage(
   message: OutgoingChatMessage,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<ReadableStream<Uint8Array>> {
   const useMultipart: boolean = message.files.length > 0;
 
   const networkChatRequest = JSON.stringify({
     message: message.message,
-    assistantName: message.assistantName
+    assistantName: message.assistantName,
   });
 
   // Call a different API endpoint depending upon whether there are files to upload or not.
@@ -78,7 +75,7 @@ export async function sendChatMessage(
   //  simple POST request here for use in the future.
   let fetchRequest: RequestInit;
   if (useMultipart) {
-    fetchRequest = buildMultipartRequestInit(networkChatRequest, message.files)
+    fetchRequest = buildMultipartRequestInit(networkChatRequest, message.files);
   } else {
     fetchRequest = buildStandardRequestInit(networkChatRequest);
   }
@@ -86,8 +83,8 @@ export async function sendChatMessage(
   fetchRequest.signal = signal;
 
   const response = await fetch(
-    useMultipart? urlMultipart : url,
-    fetchRequest
+    useMultipart ? Properties.chatStreamingMultipartUrl : Properties.chatStreamingUrl,
+    fetchRequest,
   );
 
   if (!response.ok || !response.body) {
@@ -105,4 +102,3 @@ export async function sendChatMessage(
   //  chat message text.
   return response.body;
 }
-

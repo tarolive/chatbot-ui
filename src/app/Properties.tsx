@@ -5,6 +5,7 @@ export const Properties = {
 		backendUrl: backendUrl,
 
     chatStreamingUrl: backendUrl + '/assistant/chat/streaming',
+    chatStreamingMultipartUrl: backendUrl + '/assistant/chat/streamingWithFileUpload',
     adminAssistantUrl: backendUrl + '/admin/assistant',
     knowledgeSourceUrl: backendUrl + '/admin/assistant/retrieverConnection',
     llmUrl: backendUrl + '/admin/assistant/llm',
