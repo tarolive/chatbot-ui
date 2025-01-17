@@ -1,4 +1,12 @@
-import * as React from 'react';
+import { useAppData } from '@app/AppData/AppDataContext';
+import userAvatar from '@app/bgimages/avatarImg.svg';
+import botAvatar from '@app/bgimages/RHCAI-studio-avatar.svg';
+import { HeaderDropdown } from '@app/HeaderDropdown/HeaderDropdown';
+import { Source } from '@app/types/Source';
+import { SourceResponse } from '@app/types/SourceResponse';
+import { UserFacingFile } from '@app/types/UserFacingFile';
+import { sendChatMessage } from '@app/utils/send-chat-message';
+import { ERROR_TITLE, getId } from '@app/utils/utils';
 import {
   Chatbot,
   ChatbotAlert,
@@ -15,17 +23,10 @@ import {
   MessageBox,
   MessageProps,
 } from '@patternfly/chatbot';
+import { Button } from '@patternfly/react-core';
+import * as React from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { CannedChatbot } from '../types/CannedChatbot';
-import { HeaderDropdown } from '@app/HeaderDropdown/HeaderDropdown';
-import { ERROR_TITLE, getId } from '@app/utils/utils';
-import { Button } from '@patternfly/react-core';
-import botAvatar from '@app/bgimages/RHCAI-studio-avatar.svg';
-import userAvatar from '@app/bgimages/avatarImg.svg';
-import { Source } from '@app/types/Source';
-import { SourceResponse } from '@app/types/SourceResponse';
-import { UserFacingFile } from '@app/types/UserFacingFile';
-import { useAppData } from '@app/AppData/AppDataContext';
 
 const BaseChatbot: React.FunctionComponent = () => {
   const { chatbots } = useLoaderData() as { chatbots: CannedChatbot[] };
@@ -79,8 +80,6 @@ const BaseChatbot: React.FunctionComponent = () => {
     }
   }, [messages, currentMessage, currentSources]);
 
-  const url = process.env.REACT_APP_ROUTER_URL ?? '';
-
   const ERROR_BODY = {
     'Error: 404': `${currentChatbot?.displayName ?? currentChatbot?.name} is currently unavailable. Use a different assistant or try again later.`,
     'Error: 500': `${currentChatbot?.displayName ?? currentChatbot?.name} has encountered an error and is unable to answer your question. Use a different assistant or try again later.`,
@@ -120,30 +119,16 @@ const BaseChatbot: React.FunctionComponent = () => {
     try {
       let isSource = false;
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await sendChatMessage(
+        {
           message: userMessage,
           assistantName: currentChatbot?.name,
-        }),
-        signal: newController?.signal,
-      });
+          files: files,
+        },
+        newController?.signal,
+      );
 
-      if (!response.ok || !response.body) {
-        switch (response.status) {
-          case 500:
-            throw new Error('500');
-          case 404:
-            throw new Error('404');
-          default:
-            throw new Error('Other');
-        }
-      }
-
-      const reader = response.body.getReader();
+      const reader = response.getReader();
       const decoder = new TextDecoder('utf-8');
       let done;
       const sources: string[] = [];
@@ -303,6 +288,7 @@ const BaseChatbot: React.FunctionComponent = () => {
   // example of how you can read a text file
   const readFile = (file: File) =>
     new Promise((resolve, reject) => {
+      // TODO: Files don't actually need to be read within the script, but perhaps this adds a believable delay
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
       reader.onerror = () => reject(reader.error);
@@ -330,11 +316,15 @@ const BaseChatbot: React.FunctionComponent = () => {
       return {
         name: file.name,
         id: getId(),
+        blob: file,
       };
     });
     setFiles(newFiles);
 
     fileArr.forEach((file) => {
+      // TODO: When backend supports persistent files, this is where files would be uploaded and exchanged for
+      //  file references. Depending upon upload mechanism, reading the file directly may not be necessary; instead,
+      //  it may be passed to fetch() as a File or Blob object.
       readFile(file)
         .then((data) => {
           // eslint-disable-next-line no-console
@@ -421,7 +411,7 @@ const BaseChatbot: React.FunctionComponent = () => {
           onChange={handleChange}
           isSendButtonDisabled={isSendButtonDisabled}
           handleAttach={handleAttach}
-          hasAttachButton={false}
+          hasAttachButton={true}
         />
         <ChatbotFootnote label="Verify all information from this tool. LLMs make mistakes." />
       </ChatbotFooter>

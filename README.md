@@ -13,7 +13,7 @@ Out of the box you'll get an app layout with chrome (header/sidebar), routing, b
 Create a .env file with the following values (ask for the real URLs)
 
 ```
-REACT_APP_ROUTER_URL='http://localhost:8080/assistant/chat/streaming'
+REACT_APP_BACKEND_URL='http://localhost:8080'
 REACT_APP_INFO_URL='http://localhost:8080/admin/assistant'
 REACT_APP_RETRIEVER_URL='http://localhost:8080/admin/assistant/retrieverConnection'
 REACT_APP_LLM_URL='http://localhost:8080/admin/assistant/llm'

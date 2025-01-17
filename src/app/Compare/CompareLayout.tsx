@@ -176,10 +176,15 @@ export const CompareLayout: React.FunctionComponent = () => {
       return {
         name: file.name,
         id: getId(),
+        blob: file
       };
     });
     setFiles(newFiles);
 
+    // TODO: When backend supports persistent files, this is where files would be uploaded and exchanged for
+    //  file references. Depending upon upload mechanism, reading the file directly may not be necessary; instead,
+    //  it may be passed to fetch() as a File or Blob object.
+    // TODO: This should likely be deduplicated between here and BaseChatbot.tsx
     fileArr.forEach((file) => {
       readFile(file)
         .then((data) => {
@@ -281,7 +286,7 @@ export const CompareLayout: React.FunctionComponent = () => {
             onChange={handleChange}
             isSendButtonDisabled={isSendButtonDisabled}
             handleAttach={handleAttach}
-            hasAttachButton={false}
+            hasAttachButton={true}
           />
           <ChatbotFootnote label="Verify all information from this tool. LLMs make mistakes." />
         </ChatbotFooter>

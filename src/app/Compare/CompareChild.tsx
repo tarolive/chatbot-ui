@@ -1,3 +1,4 @@
+import { sendChatMessage } from '@app/utils/send-chat-message';
 import * as React from 'react';
 import {
   Chatbot,
@@ -61,7 +62,6 @@ const CompareChild: React.FunctionComponent<CompareChildProps> = ({
   const [announcement, setAnnouncement] = React.useState<string>();
   const scrollToBottomRef = React.useRef<HTMLDivElement>(null);
   const { updateStatus } = useChildStatus();
-  const url = process.env.REACT_APP_ROUTER_URL ?? '';
   const displayMode = ChatbotDisplayMode.embedded;
 
   const handleSend = async (input: string) => {
@@ -160,33 +160,19 @@ const CompareChild: React.FunctionComponent<CompareChildProps> = ({
     try {
       let isSource = false;
 
-      setFiles([]);
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await sendChatMessage(
+        {
           message: userMessage,
           assistantName: currentChatbot?.name,
-        }),
-        signal: newController?.signal,
-      });
+          files: files ?? [],
+        },
+        newController?.signal,
+      );
 
-      if (!response.ok || !response.body) {
-        switch (response.status) {
-          case 500:
-            throw new Error('500');
-          case 404:
-            throw new Error('404');
-          default:
-            throw new Error('Other');
-        }
-      }
+      setFiles([]);
 
       // start reading the streaming message
-      const reader = response.body.getReader();
+      const reader = response.getReader();
       const decoder = new TextDecoder('utf-8');
       let done;
       const sources: string[] = [];
