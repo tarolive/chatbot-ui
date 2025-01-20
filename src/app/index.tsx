@@ -6,27 +6,24 @@ import * as React from 'react';
 
 import { RouterProvider } from 'react-router-dom';
 import { router } from '@app/routes';
+import { useConfig } from '../ConfigContext';
 
 const App: React.FunctionComponent = () => {
-  const [config, setConfig] = React.useState(null);
+  const globalConfig = useConfig();
 
-  React.useEffect(() => {
-    fetch('/public/config.json')
-      .then((response) => {
-        console.log(response);
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        console.log(response);
-        return response.json();
-      })
-      .then((data) => setConfig(data))
-      .catch((error) => console.error('Error loading config:', error));
-  }, []);
+  if (!globalConfig) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        <p>Loading configuration...</p>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <RouterProvider router={router} />
+      <div>
+        <RouterProvider router={router} />
+      </div>
     </div>
   );
 };

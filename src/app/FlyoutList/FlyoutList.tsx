@@ -1,15 +1,18 @@
-import { useAppData } from '@app/AppData/AppDataContext';
+import * as React from 'react';
+
+import { Label, Menu, MenuContent, MenuItem, MenuList, SearchInput } from '@patternfly/react-core';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+import { CannedChatbot } from '@app/types/CannedChatbot';
+import { ERROR_TITLE } from '@app/utils/utils';
+import { ErrorObject } from '@app/types/ErrorObject';
 import { FlyoutError } from '@app/FlyoutError/FlyoutError';
 import { FlyoutFooter } from '@app/FlyoutFooter/FlyoutFooter';
 import { FlyoutHeader } from '@app/FlyoutHeader/FlyoutHeader';
 import { FlyoutLoading } from '@app/FlyoutLoading/FlyoutLoading';
+import { useAppData } from '@app/AppData/AppDataContext';
+import { useConfig } from '../../ConfigContext';
 import { useFlyoutWizard } from '@app/FlyoutWizard/FlyoutWizardContext';
-import { CannedChatbot } from '@app/types/CannedChatbot';
-import { ErrorObject } from '@app/types/ErrorObject';
-import { ERROR_TITLE } from '@app/utils/utils';
-import { Label, Menu, MenuContent, MenuItem, MenuList, SearchInput } from '@patternfly/react-core';
-import * as React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 
 interface FlyoutListProps {
   typeWordPlural: string;
@@ -33,7 +36,7 @@ export const FlyoutList: React.FunctionComponent<FlyoutListProps> = ({
   const location = useLocation();
   const navigate = useNavigate();
   const { flyoutMenuSelectedChatbot, updateFlyoutMenuSelectedChatbot, chatbots, setChatbots } = useAppData();
-
+  const globalConfig = useConfig();
   const header = (
     <div className="title-with-label">
       {title} <Label variant="outline">{items.length}</Label>
@@ -64,7 +67,8 @@ export const FlyoutList: React.FunctionComponent<FlyoutListProps> = ({
   };
 
   const getAssistants = async () => {
-    const url = process.env.REACT_APP_INFO_URL ?? '';
+    const url = globalConfig?.REACT_APP_BASE_URL + '/admin/assistant' || '';
+
     try {
       const response = await fetch(url);
       if (!response.ok) {

@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import {
   Chatbot,
   ChatbotAlert,
@@ -15,17 +16,19 @@ import {
   MessageBox,
   MessageProps,
 } from '@patternfly/chatbot';
-import { useLoaderData } from 'react-router-dom';
+import { ERROR_TITLE, getId } from '@app/utils/utils';
+
+import { Button } from '@patternfly/react-core';
 import { CannedChatbot } from '../types/CannedChatbot';
 import { HeaderDropdown } from '@app/HeaderDropdown/HeaderDropdown';
-import { ERROR_TITLE, getId } from '@app/utils/utils';
-import { Button } from '@patternfly/react-core';
-import botAvatar from '@app/bgimages/RHCAI-studio-avatar.svg';
-import userAvatar from '@app/bgimages/avatarImg.svg';
 import { Source } from '@app/types/Source';
 import { SourceResponse } from '@app/types/SourceResponse';
 import { UserFacingFile } from '@app/types/UserFacingFile';
+import botAvatar from '@app/bgimages/RHCAI-studio-avatar.svg';
 import { useAppData } from '@app/AppData/AppDataContext';
+import { useConfig } from '../../ConfigContext';
+import { useLoaderData } from 'react-router-dom';
+import userAvatar from '@app/bgimages/avatarImg.svg';
 
 const BaseChatbot: React.FunctionComponent = () => {
   const { chatbots } = useLoaderData() as { chatbots: CannedChatbot[] };
@@ -44,6 +47,7 @@ const BaseChatbot: React.FunctionComponent = () => {
   const [files, setFiles] = React.useState<UserFacingFile[]>([]);
   const [isLoadingFile, setIsLoadingFile] = React.useState<boolean>(false);
   const [allChatbots, setAllChatbots] = React.useState<CannedChatbot[]>(chatbots);
+  const globalConfig = useConfig();
 
   React.useEffect(() => {
     document.title = `Red Hat Composer AI Studio | ${currentChatbot?.name}`;
@@ -79,7 +83,7 @@ const BaseChatbot: React.FunctionComponent = () => {
     }
   }, [messages, currentMessage, currentSources]);
 
-  const url = process.env.REACT_APP_ROUTER_URL ?? '';
+  const url = globalConfig?.REACT_APP_BASE_URL + '/assistant/chat/streaming' || '';
 
   const ERROR_BODY = {
     'Error: 404': `${currentChatbot?.displayName ?? currentChatbot?.name} is currently unavailable. Use a different assistant or try again later.`,

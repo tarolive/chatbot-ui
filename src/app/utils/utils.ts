@@ -13,8 +13,28 @@ export const getId = () => {
   return date.toString();
 };
 
+export const getUrl = async () => {
+  try {
+    const response = await fetch('./public/config.json'); // Load from public/config.json
+    if (!response.ok) {
+      throw new Error('Failed to load config');
+    }
+    const config = await response.json();
+    const url = config.REACT_APP_BASE_URL;
+
+    if (!url) {
+      throw new Error('API URL is not configured.');
+    }
+
+    return url;
+  } catch (error) {
+    console.error('Error fetching chatbots:', error);
+    throw error;
+  }
+};
+
 export const getChatbots = async () => {
-  const url = process.env.REACT_APP_INFO_URL ?? '';
+  const url = (await getUrl()) + '/admin/assistant' || '';
   if (url === '') {
     throw json({ status: 'Misconfigured' });
   }
