@@ -13,7 +13,6 @@ import { FlyoutFooter } from '@app/FlyoutFooter/FlyoutFooter';
 import { FlyoutHeader } from '@app/FlyoutHeader/FlyoutHeader';
 import { FlyoutLoading } from '@app/FlyoutLoading/FlyoutLoading';
 import { useAppData } from '@app/AppData/AppDataContext';
-import { useConfig } from '../../ConfigContext';
 import { useFlyoutWizard } from '@app/FlyoutWizard/FlyoutWizardContext';
 
 interface FlyoutListProps {
@@ -40,7 +39,6 @@ export const FlyoutList: React.FunctionComponent<FlyoutListProps> = ({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const globalConfig = useConfig();
   const [selectedItem, setSelectedItem] = React.useState<unknown>([]);
 
   const { updateFlyoutMenuSelectedChatbot, setChatbots } = useAppData();

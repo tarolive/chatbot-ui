@@ -23,7 +23,6 @@ import { UserFacingFile } from '@app/types/UserFacingFile';
 import botAvatar from '@app/bgimages/RHCAI-studio-avatar.svg';
 import { sendChatMessage } from '@app/utils/send-chat-message';
 import { useChildStatus } from './ChildStatusProvider';
-import { useConfig } from '../../ConfigContext';
 import userAvatar from '@app/bgimages/avatarImg.svg';
 
 interface CompareChildProps {
@@ -65,8 +64,6 @@ const CompareChild: React.FunctionComponent<CompareChildProps> = ({
   const [announcement, setAnnouncement] = React.useState<string>();
   const scrollToBottomRef = React.useRef<HTMLDivElement>(null);
   const { updateStatus } = useChildStatus();
-  const globalConfig = useConfig();
-  const url = globalConfig?.REACT_APP_BASE_URL + '/assistant/chat/streaming' || '';
 
   const displayMode = ChatbotDisplayMode.embedded;
 
