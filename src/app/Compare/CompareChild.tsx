@@ -21,6 +21,7 @@ import { Source } from '@app/types/Source';
 import { SourceResponse } from '@app/types/SourceResponse';
 import { UserFacingFile } from '@app/types/UserFacingFile';
 import botAvatar from '@app/bgimages/RHCAI-studio-avatar.svg';
+import { sendChatMessage } from '@app/utils/send-chat-message';
 import { useChildStatus } from './ChildStatusProvider';
 import { useConfig } from '../../ConfigContext';
 import userAvatar from '@app/bgimages/avatarImg.svg';
@@ -66,6 +67,7 @@ const CompareChild: React.FunctionComponent<CompareChildProps> = ({
   const { updateStatus } = useChildStatus();
   const globalConfig = useConfig();
   const url = globalConfig?.REACT_APP_BASE_URL + '/assistant/chat/streaming' || '';
+
   const displayMode = ChatbotDisplayMode.embedded;
 
   const handleSend = async (input: string) => {
@@ -164,33 +166,19 @@ const CompareChild: React.FunctionComponent<CompareChildProps> = ({
     try {
       let isSource = false;
 
-      setFiles([]);
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await sendChatMessage(
+        {
           message: userMessage,
           assistantName: currentChatbot?.name,
-        }),
-        signal: newController?.signal,
-      });
+          files: files ?? [],
+        },
+        newController?.signal,
+      );
 
-      if (!response.ok || !response.body) {
-        switch (response.status) {
-          case 500:
-            throw new Error('500');
-          case 404:
-            throw new Error('404');
-          default:
-            throw new Error('Other');
-        }
-      }
+      setFiles([]);
 
       // start reading the streaming message
-      const reader = response.body.getReader();
+      const reader = response.getReader();
       const decoder = new TextDecoder('utf-8');
       let done;
       const sources: string[] = [];

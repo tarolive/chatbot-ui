@@ -7,6 +7,8 @@ interface FlyoutFooterProps {
   onPrimaryButtonClick: () => void;
   secondaryButton?: string;
   onSecondaryButtonClick?: () => void;
+  dangerSecondaryButton?: string;
+  onDangerSecondaryButtonClick?: () => void;
   isPrimaryButtonDisabled?: boolean;
 }
 export const FlyoutFooter: React.FunctionComponent<FlyoutFooterProps> = ({
@@ -14,6 +16,8 @@ export const FlyoutFooter: React.FunctionComponent<FlyoutFooterProps> = ({
   onPrimaryButtonClick,
   secondaryButton,
   onSecondaryButtonClick,
+  dangerSecondaryButton,
+  onDangerSecondaryButtonClick,
   isPrimaryButtonDisabled,
 }: FlyoutFooterProps) => {
   return (
@@ -22,6 +26,11 @@ export const FlyoutFooter: React.FunctionComponent<FlyoutFooterProps> = ({
         {secondaryButton && onSecondaryButtonClick && (
           <Button variant="secondary" onClick={onSecondaryButtonClick}>
             {secondaryButton}
+          </Button>
+        )}
+        {dangerSecondaryButton && onDangerSecondaryButtonClick && (
+          <Button variant="secondary" isDanger onClick={onDangerSecondaryButtonClick}>
+            {dangerSecondaryButton}
           </Button>
         )}
         <Button isDisabled={isPrimaryButtonDisabled} onClick={onPrimaryButtonClick}>

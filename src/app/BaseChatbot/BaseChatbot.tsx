@@ -25,8 +25,8 @@ import { Source } from '@app/types/Source';
 import { SourceResponse } from '@app/types/SourceResponse';
 import { UserFacingFile } from '@app/types/UserFacingFile';
 import botAvatar from '@app/bgimages/RHCAI-studio-avatar.svg';
+import { sendChatMessage } from '@app/utils/send-chat-message';
 import { useAppData } from '@app/AppData/AppDataContext';
-import { useConfig } from '../../ConfigContext';
 import { useLoaderData } from 'react-router-dom';
 import userAvatar from '@app/bgimages/avatarImg.svg';
 
@@ -47,11 +47,10 @@ const BaseChatbot: React.FunctionComponent = () => {
   const [files, setFiles] = React.useState<UserFacingFile[]>([]);
   const [isLoadingFile, setIsLoadingFile] = React.useState<boolean>(false);
   const [allChatbots, setAllChatbots] = React.useState<CannedChatbot[]>(chatbots);
-  const globalConfig = useConfig();
 
   React.useEffect(() => {
     document.title = `Red Hat Composer AI Studio | ${currentChatbot?.name}`;
-  }, []);
+  }, [currentChatbot?.name]);
 
   React.useEffect(() => {
     if (appDataChatbots.length > 0) {
@@ -71,7 +70,7 @@ const BaseChatbot: React.FunctionComponent = () => {
 
   React.useEffect(() => {
     document.title = `Red Hat Composer AI Studio | ${currentChatbot?.name}${announcement ? ` - ${announcement}` : ''}`;
-  }, [announcement]);
+  }, [announcement, currentChatbot?.name]);
 
   // Auto-scrolls to the latest message
   React.useEffect(() => {
@@ -82,8 +81,6 @@ const BaseChatbot: React.FunctionComponent = () => {
       }
     }
   }, [messages, currentMessage, currentSources]);
-
-  const url = globalConfig?.REACT_APP_BASE_URL + '/assistant/chat/streaming' || '';
 
   const ERROR_BODY = {
     'Error: 404': `${currentChatbot?.displayName ?? currentChatbot?.name} is currently unavailable. Use a different assistant or try again later.`,
@@ -98,12 +95,10 @@ const BaseChatbot: React.FunctionComponent = () => {
     let newError;
     if (title && body) {
       newError = { title: ERROR_TITLE[e], body: ERROR_BODY[e] };
+    } else if ('message' in e) {
+      newError = { title: 'Error', body: e.message };
     } else {
-      if ('message' in e) {
-        newError = { title: 'Error', body: e.message };
-      } else {
-        newError = { title: 'Error', body: e };
-      }
+      newError = { title: 'Error', body: e };
     }
     setError(newError);
     // make announcement to assistive devices that there was an error
@@ -124,30 +119,16 @@ const BaseChatbot: React.FunctionComponent = () => {
     try {
       let isSource = false;
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await sendChatMessage(
+        {
           message: userMessage,
           assistantName: currentChatbot?.name,
-        }),
-        signal: newController?.signal,
-      });
+          files: files,
+        },
+        newController?.signal,
+      );
 
-      if (!response.ok || !response.body) {
-        switch (response.status) {
-          case 500:
-            throw new Error('500');
-          case 404:
-            throw new Error('404');
-          default:
-            throw new Error('Other');
-        }
-      }
-
-      const reader = response.body.getReader();
+      const reader = response.getReader();
       const decoder = new TextDecoder('utf-8');
       let done;
       const sources: string[] = [];
@@ -307,6 +288,7 @@ const BaseChatbot: React.FunctionComponent = () => {
   // example of how you can read a text file
   const readFile = (file: File) =>
     new Promise((resolve, reject) => {
+      // TODO: Files don't actually need to be read within the script, but perhaps this adds a believable delay
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
       reader.onerror = () => reject(reader.error);
@@ -334,11 +316,15 @@ const BaseChatbot: React.FunctionComponent = () => {
       return {
         name: file.name,
         id: getId(),
+        blob: file,
       };
     });
     setFiles(newFiles);
 
     fileArr.forEach((file) => {
+      // TODO: When backend supports persistent files, this is where files would be uploaded and exchanged for
+      //  file references. Depending upon upload mechanism, reading the file directly may not be necessary; instead,
+      //  it may be passed to fetch() as a File or Blob object.
       readFile(file)
         .then((data) => {
           // eslint-disable-next-line no-console
@@ -425,7 +411,7 @@ const BaseChatbot: React.FunctionComponent = () => {
           onChange={handleChange}
           isSendButtonDisabled={isSendButtonDisabled}
           handleAttach={handleAttach}
-          hasAttachButton={false}
+          hasAttachButton={true}
         />
         <ChatbotFootnote label="Verify all information from this tool. LLMs make mistakes." />
       </ChatbotFooter>

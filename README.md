@@ -13,19 +13,25 @@ Out of the box you'll get an app layout with chrome (header/sidebar), routing, b
 Create a .env file with the following values (ask for the real URLs)
 
 ```
-REACT_APP_ROUTER_URL='http://localhost:8080/assistant/chat/streaming'
+REACT_APP_BACKEND_URL='http://localhost:8080'
 REACT_APP_INFO_URL='http://localhost:8080/admin/assistant'
 REACT_APP_RETRIEVER_URL='http://localhost:8080/admin/assistant/retrieverConnection'
 REACT_APP_LLM_URL='http://localhost:8080/admin/assistant/llm'
 ```
 
 ```bash
-npm install && npm run start:dev
+npm install
+npm run openapi
+npm run start:dev
 ```
 
 ## Development scripts
 
 ```sh
+
+# Generate From Source
+npm run openapi
+
 # Install development/build dependencies
 npm install
 
@@ -121,9 +127,4 @@ With that in place, you can use the values in your code like `console.log(proces
 
 # TODOs
 
-Lets make the port that we run on configurable.
-
-(Infra) Set the Registry Secrets at the org level
-
-I will say (and we can sync about this if it does not make sense), we will need to be able to dynamically specify the backend's base url, since this is going to be a demo deployed on openshift where that URL will be auto generated.
-My optimal case would be something where we could build an image that would read an Environment variable that has the backend url on startup and that way we could just deploy that image in different environments no problem. But it looks like that may not be possible, seems like that variable needs to be defined at build time.
+Once we are able to build this with an image add back in the `npm run type-check` currently it has issues running with the build config
