@@ -1,17 +1,19 @@
-import { useAppData } from '@app/AppData/AppDataContext';
+import * as React from 'react';
+
+import { Label, Menu, MenuContent, MenuItem, MenuList, SearchInput } from '@patternfly/react-core';
+import { assistantAdminAPI, knowledgeSourceAPI, llmConnectionAPI } from '@app/adapters/APIExporter';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+import { CannedChatbot } from '@app/types/CannedChatbot';
+import { ComponentType } from '@app/types/enum/ComponentType';
+import { ERROR_TITLE } from '@app/utils/utils';
+import { ErrorObject } from '@app/types/ErrorObject';
 import { FlyoutError } from '@app/FlyoutError/FlyoutError';
 import { FlyoutFooter } from '@app/FlyoutFooter/FlyoutFooter';
 import { FlyoutHeader } from '@app/FlyoutHeader/FlyoutHeader';
 import { FlyoutLoading } from '@app/FlyoutLoading/FlyoutLoading';
+import { useAppData } from '@app/AppData/AppDataContext';
 import { useFlyoutWizard } from '@app/FlyoutWizard/FlyoutWizardContext';
-import { assistantAdminAPI, knowledgeSourceAPI, llmConnectionAPI } from '@app/adapters/APIExporter';
-import { CannedChatbot } from '@app/types/CannedChatbot';
-import { ErrorObject } from '@app/types/ErrorObject';
-import { ComponentType } from '@app/types/enum/ComponentType';
-import { ERROR_TITLE } from '@app/utils/utils';
-import { Label, Menu, MenuContent, MenuItem, MenuList, SearchInput } from '@patternfly/react-core';
-import * as React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 
 interface FlyoutListProps {
   typeWordPlural: string;
@@ -60,12 +62,10 @@ export const FlyoutList: React.FunctionComponent<FlyoutListProps> = ({
     let newError;
     if (title && body) {
       newError = { title: ERROR_TITLE[e], body: ERROR_BODY[e] };
+    } else if ('message' in e) {
+      newError = { title: 'Error', body: e.message };
     } else {
-      if ('message' in e) {
-        newError = { title: 'Error', body: e.message };
-      } else {
-        newError = { title: 'Error', body: e };
-      }
+      newError = { title: 'Error', body: e };
     }
     setError(newError);
   };
@@ -73,12 +73,12 @@ export const FlyoutList: React.FunctionComponent<FlyoutListProps> = ({
   const getItems = async () => {
     try {
       let data;
-      if(componentType == ComponentType.ASSISTANT) {
-        await assistantAdminAPI.listAssistants().then((response) => data = response.data);
-      } else if(componentType == ComponentType.KNOWLEDGE_SOURCE) {
-        await knowledgeSourceAPI.listRetrieverConnections().then((response) => data = response.data);
-      } else if(componentType == ComponentType.LLM_CONNECTION) {
-        await llmConnectionAPI.listLlmConnections().then((response) => data = response.data);
+      if (componentType == ComponentType.ASSISTANT) {
+        await assistantAdminAPI.listAssistants().then((response) => (data = response.data));
+      } else if (componentType == ComponentType.KNOWLEDGE_SOURCE) {
+        await knowledgeSourceAPI.listRetrieverConnections().then((response) => (data = response.data));
+      } else if (componentType == ComponentType.LLM_CONNECTION) {
+        await llmConnectionAPI.listLlmConnections().then((response) => (data = response.data));
       } else {
         console.error('Invalid component type');
         throw new Error('Invalid component type');
@@ -87,7 +87,7 @@ export const FlyoutList: React.FunctionComponent<FlyoutListProps> = ({
       setFilteredItems(data);
       setIsLoading(false);
       setReloadList(false);
-      if(componentType == ComponentType.ASSISTANT) {
+      if (componentType == ComponentType.ASSISTANT) {
         setChatbots(data);
       }
     } catch (error) {
@@ -98,22 +98,22 @@ export const FlyoutList: React.FunctionComponent<FlyoutListProps> = ({
   };
 
   const deleteSelectedItem = async () => {
-    if(selectedItem == null) {
+    if (selectedItem == null) {
       console.error('No item selected');
       return;
     }
-    if(componentType == ComponentType.ASSISTANT) {
+    if (componentType == ComponentType.ASSISTANT) {
       await assistantAdminAPI.deleteAssistant(selectedItem['id']);
-    } else if(componentType == ComponentType.KNOWLEDGE_SOURCE) {
+    } else if (componentType == ComponentType.KNOWLEDGE_SOURCE) {
       await knowledgeSourceAPI.deleteRetrieverConnection(selectedItem['id']);
-    } else if(componentType == ComponentType.LLM_CONNECTION) {
+    } else if (componentType == ComponentType.LLM_CONNECTION) {
       await llmConnectionAPI.deleteLlmConnection(selectedItem['id']);
     } else {
       console.error('Invalid component type');
       throw new Error('Invalid component type');
     }
     loadItems();
-  }
+  };
 
   const loadItems = async () => {
     if (reloadList) {
@@ -152,7 +152,7 @@ export const FlyoutList: React.FunctionComponent<FlyoutListProps> = ({
 
       setSelectedItem(selectedItem);
 
-      if(componentType == ComponentType.ASSISTANT) {
+      if (componentType == ComponentType.ASSISTANT) {
         updateFlyoutMenuSelectedChatbot(selectedItem);
       }
       if (location.pathname !== '/') {
@@ -209,8 +209,12 @@ export const FlyoutList: React.FunctionComponent<FlyoutListProps> = ({
           </Menu>
         </section>
       )}
-      <FlyoutFooter primaryButton={buttonText} onPrimaryButtonClick={onFooterButtonClick ?? nextStep} 
-                dangerSecondaryButton='Delete' onDangerSecondaryButtonClick={deleteSelectedItem}/>
+      <FlyoutFooter
+        primaryButton={buttonText}
+        onPrimaryButtonClick={onFooterButtonClick ?? nextStep}
+        dangerSecondaryButton="Delete"
+        onDangerSecondaryButtonClick={deleteSelectedItem}
+      />
     </>
   );
 };

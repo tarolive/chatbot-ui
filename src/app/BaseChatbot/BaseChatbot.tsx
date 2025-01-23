@@ -1,12 +1,5 @@
-import { useAppData } from '@app/AppData/AppDataContext';
-import userAvatar from '@app/bgimages/avatarImg.svg';
-import botAvatar from '@app/bgimages/RHCAI-studio-avatar.svg';
-import { HeaderDropdown } from '@app/HeaderDropdown/HeaderDropdown';
-import { Source } from '@app/types/Source';
-import { SourceResponse } from '@app/types/SourceResponse';
-import { UserFacingFile } from '@app/types/UserFacingFile';
-import { sendChatMessage } from '@app/utils/send-chat-message';
-import { ERROR_TITLE, getId } from '@app/utils/utils';
+import * as React from 'react';
+
 import {
   Chatbot,
   ChatbotAlert,
@@ -23,10 +16,19 @@ import {
   MessageBox,
   MessageProps,
 } from '@patternfly/chatbot';
+import { ERROR_TITLE, getId } from '@app/utils/utils';
+
 import { Button } from '@patternfly/react-core';
-import * as React from 'react';
-import { useLoaderData } from 'react-router-dom';
 import { CannedChatbot } from '../types/CannedChatbot';
+import { HeaderDropdown } from '@app/HeaderDropdown/HeaderDropdown';
+import { Source } from '@app/types/Source';
+import { SourceResponse } from '@app/types/SourceResponse';
+import { UserFacingFile } from '@app/types/UserFacingFile';
+import botAvatar from '@app/bgimages/RHCAI-studio-avatar.svg';
+import { sendChatMessage } from '@app/utils/send-chat-message';
+import { useAppData } from '@app/AppData/AppDataContext';
+import { useLoaderData } from 'react-router-dom';
+import userAvatar from '@app/bgimages/avatarImg.svg';
 
 const BaseChatbot: React.FunctionComponent = () => {
   const { chatbots } = useLoaderData() as { chatbots: CannedChatbot[] };
@@ -48,7 +50,7 @@ const BaseChatbot: React.FunctionComponent = () => {
 
   React.useEffect(() => {
     document.title = `Red Hat Composer AI Studio | ${currentChatbot?.name}`;
-  }, []);
+  }, [currentChatbot?.name]);
 
   React.useEffect(() => {
     if (appDataChatbots.length > 0) {
@@ -68,7 +70,7 @@ const BaseChatbot: React.FunctionComponent = () => {
 
   React.useEffect(() => {
     document.title = `Red Hat Composer AI Studio | ${currentChatbot?.name}${announcement ? ` - ${announcement}` : ''}`;
-  }, [announcement]);
+  }, [announcement, currentChatbot?.name]);
 
   // Auto-scrolls to the latest message
   React.useEffect(() => {
@@ -93,12 +95,10 @@ const BaseChatbot: React.FunctionComponent = () => {
     let newError;
     if (title && body) {
       newError = { title: ERROR_TITLE[e], body: ERROR_BODY[e] };
+    } else if ('message' in e) {
+      newError = { title: 'Error', body: e.message };
     } else {
-      if ('message' in e) {
-        newError = { title: 'Error', body: e.message };
-      } else {
-        newError = { title: 'Error', body: e };
-      }
+      newError = { title: 'Error', body: e };
     }
     setError(newError);
     // make announcement to assistive devices that there was an error

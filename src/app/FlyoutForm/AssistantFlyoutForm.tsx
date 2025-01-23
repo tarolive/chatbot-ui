@@ -1,11 +1,5 @@
-import { useAppData } from '@app/AppData/AppDataContext';
-import { FlyoutError } from '@app/FlyoutError/FlyoutError';
-import { FlyoutFooter } from '@app/FlyoutFooter/FlyoutFooter';
-import { FlyoutHeader } from '@app/FlyoutHeader/FlyoutHeader';
-import { FlyoutLoading } from '@app/FlyoutLoading/FlyoutLoading';
-import { useFlyoutWizard } from '@app/FlyoutWizard/FlyoutWizardContext';
-import { ErrorObject } from '@app/types/ErrorObject';
-import { ERROR_TITLE } from '@app/utils/utils';
+import * as React from 'react';
+
 import {
   Dropdown,
   DropdownItem,
@@ -20,9 +14,18 @@ import {
   TextArea,
   TextInput,
 } from '@patternfly/react-core';
+
+import { ERROR_TITLE } from '@app/utils/utils';
+import { ErrorObject } from '@app/types/ErrorObject';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
-import * as React from 'react';
 import { ExpandingTextInputs } from './ExpandingTextInputs';
+import { FlyoutError } from '@app/FlyoutError/FlyoutError';
+import { FlyoutFooter } from '@app/FlyoutFooter/FlyoutFooter';
+import { FlyoutHeader } from '@app/FlyoutHeader/FlyoutHeader';
+import { FlyoutLoading } from '@app/FlyoutLoading/FlyoutLoading';
+import { useAppData } from '@app/AppData/AppDataContext';
+import { useConfig } from '../../ConfigContext';
+import { useFlyoutWizard } from '@app/FlyoutWizard/FlyoutWizardContext';
 
 interface RetrieverAPIResponse {
   id: string;
@@ -44,7 +47,10 @@ interface AssistantFlyoutFormProps {
 type validate = 'success' | 'error' | 'default';
 type questionsValidate = 'error' | 'default';
 
-export const AssistantFlyoutForm: React.FunctionComponent<AssistantFlyoutFormProps> = ({ header, hideFlyout }: AssistantFlyoutFormProps) => {
+export const AssistantFlyoutForm: React.FunctionComponent<AssistantFlyoutFormProps> = ({
+  header,
+  hideFlyout,
+}: AssistantFlyoutFormProps) => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [loadedFormFields, setLoadedFormFields] = React.useState(false);
   const [title, setTitle] = React.useState('');
@@ -63,6 +69,7 @@ export const AssistantFlyoutForm: React.FunctionComponent<AssistantFlyoutFormPro
   const [questionsValidated, setQuestionsValidated] = React.useState<questionsValidate>('default');
   const { nextStep, prevStep, setReloadList } = useFlyoutWizard();
   const { chatbots } = useAppData();
+  const globalConfig = useConfig();
 
   const ERROR_BODY = {
     'Error: 404': `Service is currently unavailable. Click retry or try again later.`,
@@ -77,19 +84,16 @@ export const AssistantFlyoutForm: React.FunctionComponent<AssistantFlyoutFormPro
     let newError;
     if (title && body) {
       newError = { title: ERROR_TITLE[e], body: ERROR_BODY[e] };
+    } else if ('message' in e) {
+      newError = { title: 'Error', body: e.message };
     } else {
-      if ('message' in e) {
-        newError = { title: 'Error', body: e.message };
-      } else {
-        newError = { title: 'Error', body: e };
-      }
+      newError = { title: 'Error', body: e };
     }
     setError(newError);
   };
 
   const getRetrieverConnections = async () => {
-    const url = process.env.REACT_APP_RETRIEVER_URL ?? '';
-
+    const url = globalConfig?.REACT_APP_BASE_URL + '/admin/assistant/retrieverConnection' || '';
     try {
       const response = await fetch(url);
 
@@ -109,8 +113,7 @@ export const AssistantFlyoutForm: React.FunctionComponent<AssistantFlyoutFormPro
   };
 
   const getLLMs = async () => {
-    const url = process.env.REACT_APP_LLM_URL ?? '';
-
+    const url = globalConfig?.REACT_APP_BASE_URL + '/admin/assistant/llm' || '';
     try {
       const response = await fetch(url);
 
@@ -213,8 +216,7 @@ export const AssistantFlyoutForm: React.FunctionComponent<AssistantFlyoutFormPro
   };
 
   const createAssistant = async () => {
-    const url = process.env.REACT_APP_INFO_URL ?? '';
-
+    const url = globalConfig?.REACT_APP_BASE_URL + '/assistant/chat/streaming' || '';
     const payload = {
       name: title,
       displayName: displayName ?? title,

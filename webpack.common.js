@@ -128,9 +128,17 @@ module.exports = (env) => {
           { from: './src/web-app-manifest-192x192.png', to: 'images' },
           { from: './src/web-app-manifest-512x512.png', to: 'images' },
           { from: './src/site.webmanifest', to: 'images' },
+          { from: 'public', to: 'public' },
         ],
       }),
     ],
+    devServer: {
+      static: {
+        directory: path.join(__dirname, 'public'), // ✅ Serve files from public/
+      },
+      port: 9000, // You can change this
+      historyApiFallback: true, // Ensures React Router works properly
+    },
     resolve: {
       extensions: ['.js', '.ts', '.tsx', '.jsx'],
       plugins: [

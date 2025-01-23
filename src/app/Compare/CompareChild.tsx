@@ -1,5 +1,5 @@
-import { sendChatMessage } from '@app/utils/send-chat-message';
 import * as React from 'react';
+
 import {
   Chatbot,
   ChatbotAlert,
@@ -12,16 +12,18 @@ import {
   MessageBox,
   MessageProps,
 } from '@patternfly/chatbot';
-import { CannedChatbot } from '../types/CannedChatbot';
-import { HeaderDropdown } from '@app/HeaderDropdown/HeaderDropdown';
 import { ERROR_TITLE, getId } from '@app/utils/utils';
-import { useChildStatus } from './ChildStatusProvider';
-import botAvatar from '@app/bgimages/RHCAI-studio-avatar.svg';
-import userAvatar from '@app/bgimages/avatarImg.svg';
+
+import { CannedChatbot } from '../types/CannedChatbot';
+import { ErrorObject } from '@app/types/ErrorObject';
+import { HeaderDropdown } from '@app/HeaderDropdown/HeaderDropdown';
 import { Source } from '@app/types/Source';
 import { SourceResponse } from '@app/types/SourceResponse';
-import { ErrorObject } from '@app/types/ErrorObject';
 import { UserFacingFile } from '@app/types/UserFacingFile';
+import botAvatar from '@app/bgimages/RHCAI-studio-avatar.svg';
+import { sendChatMessage } from '@app/utils/send-chat-message';
+import { useChildStatus } from './ChildStatusProvider';
+import userAvatar from '@app/bgimages/avatarImg.svg';
 
 interface CompareChildProps {
   chatbot: CannedChatbot;
@@ -62,6 +64,7 @@ const CompareChild: React.FunctionComponent<CompareChildProps> = ({
   const [announcement, setAnnouncement] = React.useState<string>();
   const scrollToBottomRef = React.useRef<HTMLDivElement>(null);
   const { updateStatus } = useChildStatus();
+
   const displayMode = ChatbotDisplayMode.embedded;
 
   const handleSend = async (input: string) => {

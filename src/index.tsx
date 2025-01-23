@@ -1,6 +1,7 @@
+import App from '@app/index';
+import { ConfigProvider } from './ConfigContext';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from '@app/index';
 
 if (process.env.NODE_ENV !== 'production') {
   const config = {
@@ -16,6 +17,12 @@ if (process.env.NODE_ENV !== 'production') {
   axe(React, ReactDOM, 1000, config);
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root') as Element);
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
-root.render(<App />);
+root.render(
+  <React.StrictMode>
+    <ConfigProvider>
+      <App />
+    </ConfigProvider>
+  </React.StrictMode>,
+);
