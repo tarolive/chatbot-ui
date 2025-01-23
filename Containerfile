@@ -1,18 +1,11 @@
-FROM registry.access.redhat.com/ubi9/nodejs-20-minimal AS production
+# Use an official Nginx runtime as a parent image
+FROM registry.access.redhat.com/ubi9/nginx-124@sha256:a39459f55e5f8df68b9b58fd33cd53c8acabbbb9cd3df1a071187e071858f32f
 
-WORKDIR app_home
+# Copy the dist folder to the Nginx html directory
+COPY dist /usr/share/nginx/html
 
-COPY . .
-    
-# Create .cache directories 
-USER root
+# Expose port 80 to the outside world
+EXPOSE 80
 
-RUN npm install
-
-# Expose the port the app will run on
-USER 1001
-
-EXPOSE 3000
-
-# Start the application
-CMD /bin/sh -c "npm run build && npm start"
+# Command to run Nginx
+CMD ["nginx", "-g", "daemon off;"]

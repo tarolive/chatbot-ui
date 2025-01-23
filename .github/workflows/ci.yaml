@@ -5,11 +5,12 @@ on:
     branches:
       - main
       - release*
+      - docker-build
     tags:
       - v*
 
 env:
-  IMAGE_REGISTRY: quay.io/redhat-saia/chatbot-ui-patternfly
+  IMAGE_REGISTRY: quay.io/redhat-composer-ai/composer-ui
   IMAGE_BASE_REGISTRY: quay.io
 
 jobs:
@@ -57,17 +58,22 @@ jobs:
       - name: Install dependencies
         run: |
           npm install
+
+      - name: Build Distribution
+        run: |
+          npm run build
       # TODO: Figure out a cleaner way to do this
       - name: 'Tar files'
-        run: tar -cvf code.tar .
+        run: tar -cvf dist.tar dist
       - name: Archive node modules
         uses: actions/upload-artifact@v4
         with:
-          name: code
-          path: code.tar
+          name: dist
+          path: dist.tar
           include-hidden-files: true
           retention-days: 1
-  build-image:
+  build-and-push:
+    name: Build and Push Image to Quay
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
@@ -88,11 +94,12 @@ jobs:
       - name: Download node modules
         uses: actions/download-artifact@v4
         with:
-          name: code
+          name: dist
           path: .
       
       - name: 'Untar files'
-        run: tar -xvf code.tar
+        run: tar -xvf dist.tar
+        
 
       - name: Build and push
         uses: docker/build-push-action@v2
