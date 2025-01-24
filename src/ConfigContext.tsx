@@ -11,8 +11,12 @@ export const ConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   useEffect(() => {
     const fetchConfig = async () => {
+      let configUrl = './public/config.json';
+      if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+        configUrl = './public/config-local.json';
+      }
       try {
-        const response = await fetch('/public/config.json');
+        const response = await fetch(configUrl);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
