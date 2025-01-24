@@ -4,6 +4,9 @@ FROM registry.access.redhat.com/ubi9/nginx-124@sha256:a39459f55e5f8df68b9b58fd33
 # Copy the dist folder to the Nginx html directory
 COPY dist /opt/app-root/src
 
+# Copy the Nginx configuration file
+COPY .docker/nginx.conf /etc/nginx/nginx.conf
+
 # Expose port 80
 EXPOSE 8080
 
