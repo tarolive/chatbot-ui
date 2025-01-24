@@ -216,7 +216,7 @@ export const AssistantFlyoutForm: React.FunctionComponent<AssistantFlyoutFormPro
   };
 
   const createAssistant = async () => {
-    const url = globalConfig?.REACT_APP_BASE_URL + '/assistant/chat/streaming' || '';
+    const url = globalConfig?.REACT_APP_BASE_URL + '/admin/assistant/' || '';
     const payload = {
       name: title,
       displayName: displayName ?? title,
