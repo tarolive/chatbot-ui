@@ -8,6 +8,7 @@ import {
   ChatbotFooter,
   ChatbotFootnote,
   ChatbotHeader,
+  ChatbotHeaderActions,
   ChatbotHeaderMain,
   ChatbotWelcomePrompt,
   FileDetailsLabel,
@@ -19,6 +20,10 @@ import {
 import { ERROR_TITLE, getId } from '@app/utils/utils';
 
 import { Button } from '@patternfly/react-core';
+import { ToggleGroup } from '@patternfly/react-core';
+import { ToggleGroupItem } from '@patternfly/react-core';
+import Sun from '@patternfly/react-icons/dist/esm/icons/sun-icon';
+import Moon from '@patternfly/react-icons/dist/esm/icons/moon-icon';
 import { CannedChatbot } from '../types/CannedChatbot';
 import { HeaderDropdown } from '@app/HeaderDropdown/HeaderDropdown';
 import { Source } from '@app/types/Source';
@@ -47,6 +52,7 @@ const BaseChatbot: React.FunctionComponent = () => {
   const [files, setFiles] = React.useState<UserFacingFile[]>([]);
   const [isLoadingFile, setIsLoadingFile] = React.useState<boolean>(false);
   const [allChatbots, setAllChatbots] = React.useState<CannedChatbot[]>(chatbots);
+  const [isDarkTheme, setIsDarkTheme] = React.useState(false);
 
   React.useEffect(() => {
     document.title = `Red Hat Composer AI Studio | ${currentChatbot?.name}`;
@@ -82,11 +88,13 @@ const BaseChatbot: React.FunctionComponent = () => {
     }
   }, [messages, currentMessage, currentSources]);
 
+
   const ERROR_BODY = {
     'Error: 404': `${currentChatbot?.displayName ?? currentChatbot?.name} is currently unavailable. Use a different assistant or try again later.`,
     'Error: 500': `${currentChatbot?.displayName ?? currentChatbot?.name} has encountered an error and is unable to answer your question. Use a different assistant or try again later.`,
     'Error: Other': `${currentChatbot?.displayName ?? currentChatbot?.name} has encountered an error and is unable to answer your question. Use a different assistant or try again later.`,
   };
+
 
   const handleError = (e) => {
     console.error(e);
@@ -104,6 +112,16 @@ const BaseChatbot: React.FunctionComponent = () => {
     // make announcement to assistive devices that there was an error
     setAnnouncement(`Error: ${newError.title} ${newError.body}`);
   };
+
+  function handleToggleTheme(dark: boolean) {
+    setIsDarkTheme(dark);
+    if (dark) {
+      // For PatternFly 6:
+      document.documentElement.classList.add('pf-v6-theme-dark');
+    } else {
+      document.documentElement.classList.remove('pf-v6-theme-dark');
+    }
+  }
 
   // fixme this is getting too large; we should refactor
   async function fetchData(userMessage: string) {
@@ -283,6 +301,15 @@ const BaseChatbot: React.FunctionComponent = () => {
     setIsSendButtonDisabled(true);
   };
 
+  // Example Prompts
+  // --------------------------------------------------------------------------
+  // Loads and preps the example prompts from current chatbot
+  const mappedPrompts = (currentChatbot.exampleQuestions ?? []).map((question) => ({
+    title: question,
+    message: '',
+    onClick: () => handleSend(question),
+  }));
+
   // Attachments
   // --------------------------------------------------------------------------
   // example of how you can read a text file
@@ -356,11 +383,34 @@ const BaseChatbot: React.FunctionComponent = () => {
         <ChatbotHeaderMain>
           <HeaderDropdown selectedChatbot={currentChatbot} chatbots={allChatbots} onSelect={onSelect} />
         </ChatbotHeaderMain>
-        {allChatbots.length >= 2 && (
-          <Button component="a" href={`/compare?assistants=${allChatbots[0].name}%2C${allChatbots[1].name}`}>
-            Compare
-          </Button>
-        )}
+        <ChatbotHeaderActions>
+          <ToggleGroup aria-label="Dark theme toggle group">
+            <ToggleGroupItem
+              isSelected={!isDarkTheme}
+              aria-pressed={!isDarkTheme}
+              icon={<Sun />}
+              aria-label="light theme toggle"
+              onClick={() => handleToggleTheme(false)}
+            >
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              isSelected={isDarkTheme}
+              aria-pressed={isDarkTheme}
+              icon={<Moon />}
+              aria-label="dark theme toggle"
+              onClick={() => handleToggleTheme(true)}
+            >
+            </ToggleGroupItem>
+          </ToggleGroup>
+          {allChatbots.length >= 2 && (
+            <Button
+              component="a"
+              href={`/compare?assistants=${allChatbots[0].name}%2C${allChatbots[1].name}`}
+            >
+              Compare
+            </Button>
+          )}
+        </ChatbotHeaderActions>
       </ChatbotHeader>
       <ChatbotContent>
         <MessageBox announcement={announcement}>
@@ -376,7 +426,7 @@ const BaseChatbot: React.FunctionComponent = () => {
               {error.body}
             </ChatbotAlert>
           )}
-          <ChatbotWelcomePrompt title="Hello, Chatbot User" description="How may I help you today?" />
+          <ChatbotWelcomePrompt title="Hello, Chatbot User" description="How may I help you today?" prompts={mappedPrompts} />
           {messages.map((message) => (
             <Message key={message.id} {...message} />
           ))}
