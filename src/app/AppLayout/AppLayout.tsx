@@ -18,14 +18,14 @@ import { SidebarWithFlyout } from '@app/SidebarWithFlyout/SidebarWithFlyout';
 import { AppDataProvider } from '@app/AppData/AppDataContext';
 
 const AppLayout: React.FunctionComponent = () => {
-  const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   // If you close the sidebar on mobile and go back to desktop, you lose it forever (or at least until reload)
   // This forces it to reopen if that happens.
   React.useEffect(() => {
     const updateSidebar = () => {
       if (window.innerWidth >= 1200) {
-        setSidebarOpen(true);
+        setSidebarOpen(false);
       }
     };
     window.addEventListener('resize', updateSidebar);
@@ -42,7 +42,7 @@ const AppLayout: React.FunctionComponent = () => {
           <Button
             icon={<BarsIcon />}
             variant="plain"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
+            onClick={() => setSidebarOpen(false)}
             aria-label="Global navigation"
           />
         </MastheadToggle>
