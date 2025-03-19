@@ -182,7 +182,7 @@ pf-v6-c-page__main-container.pf-m-fill {
   }
   .pf-v6-c-page__main-container {
     @media screen and (min-width: 1024px) {
-      border-top: 0px;
+      /*border-top: 0px;*/
     }
     @media screen and (max-width: 900px) {
       --pf-v6-c-page__main-container--MarginInlineStart: 0;
@@ -499,4 +499,9 @@ pf-v6-c-page__main-container.pf-m-fill {
   position: absolute;
   opacity: 0;
   z-index: -1;
+}
+
+.pf-chatbot__header-container,
+.pf-chatbot__prompt-suggestions {
+  display: none !important;
 }

@@ -426,7 +426,7 @@ const BaseChatbot: React.FunctionComponent = () => {
               {error.body}
             </ChatbotAlert>
           )}
-          <ChatbotWelcomePrompt title="Hello, Chatbot User" description="How may I help you today?" prompts={mappedPrompts} />
+          <ChatbotWelcomePrompt title="Hello," description="How may I help you today?" prompts={mappedPrompts} />
           {messages.map((message) => (
             <Message key={message.id} {...message} />
           ))}

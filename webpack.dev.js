@@ -11,6 +11,7 @@ module.exports = merge(common('development'), {
   mode: 'development',
   devtool: 'eval-source-map',
   devServer: {
+    allowedHosts: "all",
     host: HOST,
     port: PORT,
     historyApiFallback: true,

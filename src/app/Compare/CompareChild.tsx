@@ -300,7 +300,7 @@ const CompareChild: React.FunctionComponent<CompareChildProps> = ({
               {error?.body}
             </ChatbotAlert>
           )}
-          <ChatbotWelcomePrompt title="Hello, Chatbot User" description="How may I help you today?" />
+          <ChatbotWelcomePrompt title="Hello," description="How may I help you today?" />
           {messages.map((message) => (
             <Message key={message.id} {...message} />
           ))}
