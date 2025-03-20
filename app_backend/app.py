@@ -1,11 +1,11 @@
-from elasticsearch                import Elasticsearch
-from flask                        import Flask, request
-from langchain.chains             import RetrievalQA
-from langchain_elasticsearch      import ElasticsearchStore
-from langchain_openai             import ChatOpenAI
-from os                           import getenv
-from sentence_transformers        import SentenceTransformer
-from urllib3                      import disable_warnings
+from elasticsearch                    import Elasticsearch
+from flask                            import Flask, request
+from langchain.chains                 import RetrievalQA
+from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain_elasticsearch          import ElasticsearchStore
+from langchain_openai                 import ChatOpenAI
+from os                               import getenv
+from urllib3                          import disable_warnings
 
 disable_warnings()
 
@@ -20,28 +20,21 @@ LLM_VISION_API_BASE    = getenv('LLM_VISION_API_BASE')
 LLM_VISION_API_KEY     = getenv('LLM_VISION_API_KEY')
 LLM_VISION_MODEL_NAME  = getenv('LLM_VISION_MODEL_NAME')
 
+embedding = HuggingFaceEmbeddings(
+    model_name   = 'nomic-ai/nomic-embed-text-v1',
+    model_kwargs = {
+        'trust_remote_code' : True
+    }
+)
 
-class Embedding:
-
-    def __init__(self, model):
-
-        self.model = model
-
-    def embed_query(self, query):
-
-        return self.model.encode(query)
-
-
-embedding = Embedding(SentenceTransformer('all-MiniLM-L6-v2'))
-
-elasticsearch_connection = Elasticsearch(
+es_connection = Elasticsearch(
     hosts        = ELASTICSEARCH_HOST,
     basic_auth   = (ELASTICSEARCH_USER, ELASTICSEARCH_PASSWORD),
     verify_certs = False
 )
 
-elasticsearch_store = ElasticsearchStore(
-    es_connection = elasticsearch_connection,
+es_store = ElasticsearchStore(
+    es_connection = es_connection,
     index_name    = ELASTICSEARCH_INDEX,
     embedding     = embedding
 )
@@ -53,8 +46,9 @@ llm = ChatOpenAI(
 )
 
 qa = RetrievalQA.from_llm(
-    llm       = llm,
-    retriever = elasticsearch_store.as_retriever()
+    llm                     = llm,
+    retriever               = es_store.as_retriever(),
+    return_source_documents = True
 )
 
 llm_vision = ChatOpenAI(
@@ -66,9 +60,15 @@ llm_vision = ChatOpenAI(
 app = Flask(__name__)
 
 
-@app.route('/', methods = ['GET', 'POST'])
+@app.route('/', methods = ['POST'])
 def handle_message() -> dict:
 
-    return {
-        'status' : 'ok'
+    message = request.json['message']
+
+    params = {
+        'query' : message
     }
+
+    response = qa.invoke(params)
+
+    return response
