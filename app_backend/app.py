@@ -16,8 +16,23 @@ ELASTICSEARCH_INDEX    = getenv('ELASTICSEARCH_INDEX')
 LLM_API_BASE           = getenv('LLM_API_BASE')
 LLM_API_KEY            = getenv('LLM_API_KEY')
 LLM_MODEL_NAME         = getenv('LLM_MODEL_NAME')
+LLM_VISION_API_BASE    = getenv('LLM_VISION_API_BASE')
+LLM_VISION_API_KEY     = getenv('LLM_VISION_API_KEY')
+LLM_VISION_MODEL_NAME  = getenv('LLM_VISION_MODEL_NAME')
 
-embedding = SentenceTransformer('all-MiniLM-L6-v2')
+
+class Embedding:
+
+    def __init__(self, model):
+
+        self.model = model
+
+    def embed_query(self, query):
+
+        return self.model.encode(query)
+
+
+embedding = Embedding(SentenceTransformer('all-MiniLM-L6-v2'))
 
 elasticsearch_connection = Elasticsearch(
     hosts        = ELASTICSEARCH_HOST,
@@ -40,6 +55,12 @@ llm = ChatOpenAI(
 qa = RetrievalQA.from_llm(
     llm       = llm,
     retriever = elasticsearch_store.as_retriever()
+)
+
+llm_vision = ChatOpenAI(
+    openai_api_base = f'{LLM_VISION_API_BASE}/v1',
+    openai_api_key  = LLM_VISION_API_KEY,
+    model_name      = LLM_VISION_MODEL_NAME
 )
 
 app = Flask(__name__)
