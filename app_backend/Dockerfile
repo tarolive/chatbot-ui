@@ -5,6 +5,7 @@ COPY . /app
 
 RUN pip install --upgrade einops \
                           flask \
+                          flask-cors \
                           langchain \
                           langchain-community \
                           langchain-elasticsearch \

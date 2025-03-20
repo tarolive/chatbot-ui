@@ -1,5 +1,6 @@
 from elasticsearch                    import Elasticsearch
 from flask                            import Flask, request
+from flask_cors                       import CORS
 from langchain.chains                 import RetrievalQA
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain_elasticsearch          import ElasticsearchStore
@@ -58,6 +59,7 @@ llm_vision = ChatOpenAI(
 )
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/', methods = ['POST'])
