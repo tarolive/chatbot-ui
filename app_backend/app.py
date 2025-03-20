@@ -65,6 +65,9 @@ CORS(app)
 @app.route('/', methods = ['POST'])
 def handle_message() -> dict:
 
+    print('REQUEST:')
+    print(request.json)
+
     message = request.json['message']
 
     params = {
