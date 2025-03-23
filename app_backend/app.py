@@ -83,4 +83,4 @@ def handle_message() -> str:
 
     text = qa_response['result']
 
-    return f'{dumps(sources)}{text}'
+    return f'START_SOURCES_STRING{dumps(sources)}END_SOURCES_STRING{text}'
