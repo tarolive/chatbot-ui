@@ -73,18 +73,15 @@ def handle_message() -> str:
     }
 
     qa_response = qa.invoke(params)
-    qa_response['source_documents'] = [{
-        'page_content' : source_document.page_content,
-        'metadata'     : source_document.metadata
+
+    sources = [{
+        'text' : source_document.metadata.source
+        'metadata' : {
+            'source' : 'https://redhat.com'
+        }
     } for source_document in qa_response['source_documents']]
 
-    response = qa_response['result']
+    text = qa_response['result']
 
-#    for source_document in qa_response['source_documents']:
+    return f'{dumps(sources)}{text}'
 
-#        source_document['text'] = 'Arquivo'
-#        source = dumps(source_document)
-#        response += f"START_SOURCES_STRING[{source}]END_SOURCES_STRING"
-#        break
-
-    return response
