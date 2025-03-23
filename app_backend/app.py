@@ -80,11 +80,11 @@ def handle_message() -> str:
 
     response = qa_response['result']
 
-    for source_document in qa_response['source_documents']:
+#    for source_document in qa_response['source_documents']:
 
-        source_document['text'] = 'Arquivo'
-        source = dumps(source_document)
-        response += f"START_SOURCES_STRING{source}END_SOURCES_STRING"
-        break
+#        source_document['text'] = 'Arquivo'
+#        source = dumps(source_document)
+#        response += f"START_SOURCES_STRING[{source}]END_SOURCES_STRING"
+#        break
 
     return response
