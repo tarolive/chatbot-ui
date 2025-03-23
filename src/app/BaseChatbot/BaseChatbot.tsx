@@ -205,9 +205,10 @@ const BaseChatbot: React.FunctionComponent = () => {
 
       if (sources && sources.length > 0) {
         const sourcesString = sources.join('');
-        const parsedSources: SourceResponse = JSON.parse(sourcesString);
+//        const parsedSources: SourceResponse = JSON.parse(sourcesString);
         const formattedSources: Source[] = [];
-        parsedSources.content.forEach((source) => {
+//        parsedSources.content.forEach((source) => {
+        JSON.parse(sourcesString).forEach((source) => {
           formattedSources.push({ link: source.metadata.source, body: source.text });
         });
         setController(newController);
@@ -433,7 +434,7 @@ const BaseChatbot: React.FunctionComponent = () => {
           {currentMessage.length > 0 && (
             <Message
               avatar={botAvatar}
-              name={currentChatbot?.displayName ?? currentChatbot?.name}
+              name="Assistente SEMIL"
               key="currentMessage"
               role="bot"
               content={currentMessage.join('')}

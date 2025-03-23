@@ -83,7 +83,8 @@ export async function sendChatMessage(
   fetchRequest.signal = signal;
 
   const response = await fetch(
-    useMultipart ? Properties.chatStreamingMultipartUrl : Properties.chatStreamingUrl,
+    //useMultipart ? Properties.chatStreamingMultipartUrl : Properties.chatStreamingUrl,
+    "https://chatbot-backend-demo-semil.apps.cluster-6b7j2.6b7j2.sandbox1809.opentlc.com",
     fetchRequest,
   );
 

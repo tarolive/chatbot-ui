@@ -3,7 +3,7 @@ from flask                            import Flask, request
 from flask_cors                       import CORS
 from json                             import dumps
 from langchain.chains                 import RetrievalQA
-from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings   import HuggingFaceEmbeddings
 from langchain_elasticsearch          import ElasticsearchStore
 from langchain_openai                 import ChatOpenAI
 from os                               import getenv
