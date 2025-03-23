@@ -1,6 +1,7 @@
 from elasticsearch                    import Elasticsearch
 from flask                            import Flask, request
 from flask_cors                       import CORS
+from json                             import dumps
 from langchain.chains                 import RetrievalQA
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain_elasticsearch          import ElasticsearchStore
@@ -81,7 +82,9 @@ def handle_message() -> str:
 
     for source_document in qa_response['source_documents']:
 
-        response += f"START_SOURCES_STRING{source_document['metadata']['source']}END_SOURCES_STRING"
+        source_document['text'] = 'Arquivo'
+        source = dumps(source_document)
+        response += f"START_SOURCES_STRING{source}END_SOURCES_STRING"
         break
 
     return response
