@@ -81,7 +81,7 @@ def handle_message() -> str:
 
     for source_document in qa_response['source_documents']:
 
-        response += f'START_SOURCES_STRING{source_document['metadata']['source']}END_SOURCES_STRING'
+        response += f"START_SOURCES_STRING{source_document['metadata']['source']}END_SOURCES_STRING"
         break
 
     return response
