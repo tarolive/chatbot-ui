@@ -63,7 +63,7 @@ CORS(app)
 
 
 @app.route('/', methods = ['POST'])
-def handle_message() -> dict:
+def handle_message() -> str:
 
     message = request.json['message']
 
@@ -71,10 +71,17 @@ def handle_message() -> dict:
         'query' : message
     }
 
-    response = qa.invoke(params)
-    response['source_documents'] = [{
+    qa_response = qa.invoke(params)
+    qa_response['source_documents'] = [{
         'page_content' : source_document.page_content,
         'metadata'     : source_document.metadata
-    } for source_document in response['source_documents']]
+    } for source_document in qa_response['source_documents']]
+
+    response = qa_response['result']
+
+    for source_document in qa_response['source_documents']:
+
+        response += f'START_SOURCES_STRING{source_document['metadata']['source']}END_SOURCES_STRING'
+        break
 
     return response
