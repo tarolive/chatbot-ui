@@ -67,13 +67,14 @@ def handle_message() -> dict:
 
     message = request.json['message']
 
-    print('MESSAGE:')
-    print(message)
-
     params = {
         'query' : message
     }
 
     response = qa.invoke(params)
+    response['source_documents'] = [{
+        'page_content' : source_document.page_content,
+        'metadata'     : source_document.metadata
+    } for source_document in response['source_documents']]
 
     return response
