@@ -75,7 +75,7 @@ def handle_message() -> str:
     qa_response = qa.invoke(params)
 
     sources = [{
-        'text' : source_document.metadata.source
+        'text' : source_document['metadata']['source']
         'metadata' : {
             'source' : 'https://redhat.com'
         }
@@ -84,4 +84,3 @@ def handle_message() -> str:
     text = qa_response['result']
 
     return f'{dumps(sources)}{text}'
-
