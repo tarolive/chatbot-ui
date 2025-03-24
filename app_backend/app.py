@@ -3,6 +3,7 @@ from flask                            import Flask, request
 from flask_cors                       import CORS
 from json                             import dumps
 from langchain.chains                 import RetrievalQA
+from langchain_core.messages          import HumanMessage
 from langchain_community.embeddings   import HuggingFaceEmbeddings
 from langchain_elasticsearch          import ElasticsearchStore
 from langchain_openai                 import ChatOpenAI
@@ -66,11 +67,46 @@ CORS(app)
 @app.route('/', methods = ['POST'])
 def handle_message() -> str:
 
+    print(request.json)
+
     message = request.json['message']
+    image_context = ''
+
+    if 'document' in message.files:
+
+        img = message.files['document']
+
+        vision_response = llm_vision.invoke(
+            [
+                HumanMessage(
+                    content = [
+                        {
+                            'type' : 'text',
+                            'text' : '''Você é um assistente especializado em Legislação Ambiental.
+                            Seu objetivo é extrair informações de um arquivo PDF, contendo informações de processos ambientais,
+                            danos ambientais, incêndios e animais.
+                            Em até 200 palavras, faça uma descrição da imagem, em PORTUGUÊS.
+                            Se a imagem não conter informações de danos ambientes, responda que você não entende outro contexto!'''
+                        },
+                        {
+                            'type'      : 'image_url',
+                            'image_url' : {
+                                'url' : f'data:image/jpeg;base64,{img}'
+                            }
+                        }
+                    ]
+                )
+            ]
+        )
+
+        image_context = vision_response.content
 
     params = {
         'query' : message
     }
+
+    if image_context:
+        params['query'] = f'{message} IMAGEM: {image_context}'
 
     qa_response = qa.invoke(params)
 
