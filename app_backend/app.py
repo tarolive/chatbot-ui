@@ -74,12 +74,18 @@ def handle_message() -> str:
 
     qa_response = qa.invoke(params)
 
-    sources = [{
+    qa_response_sources = [{
         'text' : source_document.metadata['source'],
         'metadata' : {
             'source' : 'https://redhat.com'
         }
     } for source_document in qa_response['source_documents']]
+
+    sources = []
+    for source in qa_response_sources:
+        util = [s['metadata']['source'] for s in sources]
+        if source['metadata']['source'] not in util:
+            sources.append(source)
 
     text = qa_response['result']
 

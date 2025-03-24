@@ -236,7 +236,7 @@ const BaseChatbot: React.FunctionComponent = () => {
       newMessages.push({
         avatar: botAvatar,
         id: getId(),
-        name: currentChatbot?.displayName ?? currentChatbot?.name,
+        name: 'Assistente SEMIL',
         role: 'bot',
         content: currentMessage.join(''),
         ...(currentSources && { sources: { sources: currentSources } }),
@@ -251,7 +251,7 @@ const BaseChatbot: React.FunctionComponent = () => {
     newMessages.push({
       avatar: userAvatar,
       id: getId(),
-      name: 'You',
+      name: 'Você',
       role: 'user',
       content: input,
       timestamp: `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`,
@@ -427,7 +427,7 @@ const BaseChatbot: React.FunctionComponent = () => {
               {error.body}
             </ChatbotAlert>
           )}
-          <ChatbotWelcomePrompt title="Hello," description="How may I help you today?" prompts={mappedPrompts} />
+          <ChatbotWelcomePrompt title="Olá," description="Sou o Assistente SEMIL. Como posso te ajudar hoje?" prompts={mappedPrompts} />
           {messages.map((message) => (
             <Message key={message.id} {...message} />
           ))}
@@ -464,7 +464,7 @@ const BaseChatbot: React.FunctionComponent = () => {
           handleAttach={handleAttach}
           hasAttachButton={true}
         />
-        <ChatbotFootnote label="Verify all information from this tool. LLMs make mistakes." />
+        <ChatbotFootnote label="Verifique todas as informações. LLMs podem cometer erros." />
       </ChatbotFooter>
     </Chatbot>
   );
