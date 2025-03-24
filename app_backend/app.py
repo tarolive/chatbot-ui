@@ -72,9 +72,9 @@ def handle_message() -> str:
     message = request.json['message']
     image_context = ''
 
-    if 'document' in message.files:
+    if 'document' in request.files:
 
-        img = message.files['document']
+        img = request.files['document']
 
         vision_response = llm_vision.invoke(
             [
