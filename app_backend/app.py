@@ -82,7 +82,7 @@ CORS(app)
 @app.route('/', methods = ['POST'])
 def handle_message() -> str:
 
-    print(request.json)
+    print(request)
 
     message = request.json['message']
     image_context = ''
