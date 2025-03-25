@@ -76,7 +76,7 @@ llm_vision = ChatOpenAI(
 )
 
 app = Flask(__name__)
-#CORS(app)
+CORS(app)
 
 
 @app.route('/', methods = ['POST'])
