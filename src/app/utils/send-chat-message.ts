@@ -90,7 +90,8 @@ export async function sendChatMessage(
     fetchRequest = buildStandardRequestInit(networkChatRequest);
 //  }
 
-  fetchRequest.signal = signal;
+//  fetchRequest.signal = signal;
+  fetchRequest.signal = AbortSignal.timeout(60000);
 
   const response = await fetch(
     //useMultipart ? Properties.chatStreamingMultipartUrl : Properties.chatStreamingUrl,
