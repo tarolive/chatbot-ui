@@ -80,8 +80,9 @@ CORS(app)
 
 
 @app.route('/', methods = ['POST'])
-def handle_message() -> str:
+def handle_message():
 
+    print(request.form)
     print(request.json)
 
     message = request.json['message']
