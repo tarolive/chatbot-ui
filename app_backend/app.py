@@ -50,8 +50,8 @@ llm = ChatOpenAI(
 )
 
 template = '''
-Você é um assistente para tarefas de resposta a perguntas.
-Use os seguintes pedaços de contexto recuperado para responder à pergunta.
+Você é um assistente para tarefas de resposta a perguntas especialista em infrações ambientais.
+Use o contexto para responder à pergunta.
 Se você não sabe a resposta, apenas diga que não sabe.
 Pergunta: {question}
 Contexto: {context}
@@ -76,13 +76,13 @@ llm_vision = ChatOpenAI(
 )
 
 app = Flask(__name__)
-CORS(app)
+#CORS(app)
 
 
 @app.route('/', methods = ['POST'])
 def handle_message() -> str:
 
-    print(request)
+    print(request.json)
 
     message = request.json['message']
     image_context = ''
@@ -134,8 +134,8 @@ def handle_message() -> str:
 
     sources = []
     for source in qa_response_sources:
-        util = [s['metadata']['source'] for s in sources]
-        if source['metadata']['source'] not in util:
+        util = [s['text'] for s in sources]
+        if source['text'] not in util:
             sources.append(source)
 
     text = qa_response['result']
