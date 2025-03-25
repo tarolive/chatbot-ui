@@ -82,15 +82,14 @@ CORS(app)
 @app.route('/', methods = ['POST'])
 def handle_message():
 
-    print(request.form)
     print(request.json)
 
     message = request.json['message']
+    image   = request.json['image']
+
     image_context = ''
 
-    if 'document' in request.files:
-
-        img = request.files['document']
+    if len(image) > 0:
 
         vision_response = llm_vision.invoke(
             [
@@ -107,7 +106,7 @@ def handle_message():
                         {
                             'type'      : 'image_url',
                             'image_url' : {
-                                'url' : f'data:image/jpeg;base64,{img}'
+                                'url' : f'data:image/jpeg;base64,{image}'
                             }
                         }
                     ]
