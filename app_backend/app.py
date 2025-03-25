@@ -1,14 +1,15 @@
-from elasticsearch                    import Elasticsearch
-from flask                            import Flask, request
-from flask_cors                       import CORS
-from json                             import dumps
-from langchain.chains                 import RetrievalQA
-from langchain_core.messages          import HumanMessage
-from langchain_community.embeddings   import HuggingFaceEmbeddings
-from langchain_elasticsearch          import ElasticsearchStore
-from langchain_openai                 import ChatOpenAI
-from os                               import getenv
-from urllib3                          import disable_warnings
+from elasticsearch                  import Elasticsearch
+from flask                          import Flask, request
+from flask_cors                     import CORS
+from json                           import dumps
+from langchain.chains               import RetrievalQA
+from langchain.prompts              import PromptTemplate
+from langchain_core.messages        import HumanMessage
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_elasticsearch        import ElasticsearchStore
+from langchain_openai               import ChatOpenAI
+from os                             import getenv
+from urllib3                        import disable_warnings
 
 disable_warnings()
 
@@ -48,10 +49,26 @@ llm = ChatOpenAI(
     model_name      = LLM_MODEL_NAME
 )
 
+template = '''
+Você é um especialista em análise de infrações ambientais.
+Use o contexto para responder à pergunta.
+Se você não souber responder, apenas responda que você não tem conhecimento para responder.
+Tente ser o mais claro possível.
+
+CONTEXTO: {context}
+
+PERGUNTA: {question}
+'''
+
+prompt = PromptTemplate.from_template(template)
+
 qa = RetrievalQA.from_llm(
     llm                     = llm,
     retriever               = es_store.as_retriever(),
-    return_source_documents = True
+    return_source_documents = True,
+    chain_type_kwargs       = {
+        'prompt' : prompt
+    }
 )
 
 llm_vision = ChatOpenAI(
