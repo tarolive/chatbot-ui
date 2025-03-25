@@ -64,9 +64,19 @@ export async function sendChatMessage(
 ): Promise<ReadableStream<Uint8Array>> {
   const useMultipart: boolean = message.files.length > 0;
 
+  const readFile = (file) =>
+    new Promise((resolve, reject) => {
+      // TODO: Files don't actually need to be read within the script, but perhaps this adds a believable delay
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+
   const networkChatRequest = JSON.stringify({
     message: message.message,
     assistantName: message.assistantName,
+    image: useMultipart ? await readFile(message.files[0].blob) : ''
   });
 
   // Call a different API endpoint depending upon whether there are files to upload or not.
@@ -74,11 +84,11 @@ export async function sendChatMessage(
   //  once persistent files are an option on the backend. As such, it seems better to keep the more straightforward
   //  simple POST request here for use in the future.
   let fetchRequest: RequestInit;
-  if (useMultipart) {
-    fetchRequest = buildMultipartRequestInit(networkChatRequest, message.files);
-  } else {
+//  if (useMultipart) {
+//    fetchRequest = buildMultipartRequestInit(networkChatRequest, message.files);
+//  } else {
     fetchRequest = buildStandardRequestInit(networkChatRequest);
-  }
+//  }
 
   fetchRequest.signal = signal;
 
