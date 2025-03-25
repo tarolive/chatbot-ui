@@ -50,19 +50,17 @@ llm = ChatOpenAI(
 )
 
 template = '''
-Você é um especialista em análise de infrações ambientais.
-Use o contexto para responder à pergunta.
-Se você não souber responder, apenas responda que você não tem conhecimento para responder.
-Tente ser o mais claro possível.
-
-CONTEXTO: {context}
-
-PERGUNTA: {question}
+Você é um assistente para tarefas de resposta a perguntas.
+Use os seguintes pedaços de contexto recuperado para responder à pergunta.
+Se você não sabe a resposta, apenas diga que não sabe.
+Pergunta: {question}
+Contexto: {context}
+Resposta:
 '''
 
 prompt = PromptTemplate.from_template(template)
 
-qa = RetrievalQA.from_llm(
+qa = RetrievalQA.from_chain_type(
     llm                     = llm,
     retriever               = es_store.as_retriever(),
     return_source_documents = True,
