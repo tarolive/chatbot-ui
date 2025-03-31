@@ -13,10 +13,10 @@ spec:
   triggers:
     - type: ConfigChange
   source:
-    contextDir: builds/
+    contextDir: app_pipeline/builds/
     type: Git
     git:
-      uri: https://github.com/tarolive/demo-irpf.git
+      uri: https://github.com/tarolive/chatbot-ui.git
   strategy:
     type: Docker
     dockerStrategy:
