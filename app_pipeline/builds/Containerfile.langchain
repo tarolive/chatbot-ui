@@ -2,9 +2,9 @@ FROM registry.access.redhat.com/ubi9/python-311
 WORKDIR /app
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir --upgrade "huggingface_hub[cli]" \
+    pip install --no-cache-dir --upgrade "huggingface_hub[cli]"==0.30.1 \
                                          langchain==0.3.23 \
-                                         langchain-huggingface==0.1.2 \
+                                         langchain-huggingface==0.1.2
 
 USER 1001
 
