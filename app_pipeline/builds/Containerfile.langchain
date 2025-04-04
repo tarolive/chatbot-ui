@@ -1,0 +1,11 @@
+FROM registry.access.redhat.com/ubi9/python-311
+WORKDIR /app
+
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --upgrade "huggingface_hub[cli]" \
+                                         langchain==0.3.23 \
+                                         langchain-huggingface==0.1.2 \
+
+USER 1001
+
+RUN huggingface-cli download nomic-ai/nomic-embed-text-v1 --local-dir nomic-ai/nomic-embed-text-v1
