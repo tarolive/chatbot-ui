@@ -1,0 +1,8 @@
+FROM registry.access.redhat.com/ubi9/python-311
+WORKDIR /app
+
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --upgrade langchain-community==0.3.21 \
+                                         openai==1.70.0
+
+USER 1001
